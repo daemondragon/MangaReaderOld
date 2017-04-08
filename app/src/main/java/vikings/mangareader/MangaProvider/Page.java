@@ -1,12 +1,20 @@
 package vikings.mangareader.MangaProvider;
 
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 
 /**
  * Contain only a page as well as previous and next one.
  */
 interface Page
 {
+    /**
+     * Load the page to have all information about it.
+     * @param success will be called if the loading is a success
+     * @param error will be called if an error occurred.
+     */
+    void load(@Nullable Runnable success, @Nullable Runnable error);
+
     /**
      * Check if page has a previous one
      * @return true if there is a previous page, false otherwise

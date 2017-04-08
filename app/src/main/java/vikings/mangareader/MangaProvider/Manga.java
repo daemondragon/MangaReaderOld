@@ -1,14 +1,22 @@
 package vikings.mangareader.MangaProvider;
 
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
 /**
  * Contain all information about the manga.
  */
-public interface Manga
+interface Manga
 {
+    /**
+     * Load the manga to have all information about it.
+     * @param success will be called if the loading is a success
+     * @param error will be called if an error occurred.
+     */
+    void load(@Nullable Runnable success, @Nullable Runnable error);
+
     /**
      * Get the name of the manga.
      * @return the name, or null if none is found.
