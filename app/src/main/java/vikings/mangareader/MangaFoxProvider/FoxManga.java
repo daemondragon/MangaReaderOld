@@ -13,16 +13,17 @@ import java.util.List;
 import vikings.mangareader.MangaProvider.Chapter;
 import vikings.mangareader.MangaProvider.Manga;
 
-public class FoxManga implements Manga
+class FoxManga implements Manga
 {
     private String url = null;
     private String name = null;
     private String authors = null;
     private String summary = null;
     private Drawable cover = null;
+    private List<String> genres = new ArrayList<>();
     private ArrayList<Chapter> chapters = new ArrayList<>();
 
-    public FoxManga(String name, String url)
+    FoxManga(String name, String url)
     {
         this.name = name;
         this.url = url;
@@ -36,7 +37,7 @@ public class FoxManga implements Manga
             public void run()
             {
                 Handler handler = new Handler(Looper.getMainLooper());
-                if (parseMangaInfo(Utils.InputStreamToString(Utils.getInputStreamFromURL("http://mangafox.me/releases/"))))
+                if (parseMangaInfo(Utils.InputStreamToString(Utils.getInputStreamFromURL(url))))
                     handler.post(success);
                 else
                     handler.post(error);
@@ -59,6 +60,8 @@ public class FoxManga implements Manga
         return (summary);
     }
 
+    public List<String> genres() { return (genres); }
+
     public Drawable cover()
     {
         return (cover);
@@ -74,15 +77,16 @@ public class FoxManga implements Manga
         if (html == null || "".equals(html))
             return (false);
 
-        summary = Utils.fromHtmlString(Utils.parse(html, "<p class=\"summary\">", ">", "</p>"));
-        authors = Utils.parse(html, "href=\"/search/artist/", ">", "<");
+        summary = Utils.fromHtmlString(Utils.parseUnique(html, "<p class=\"summary\">", ">", "</p>"));
+        authors = Utils.parseUnique(html, "href=\"/search/artist/", ">", "<");
+        genres = Utils.parseMultiple(html, "<a href=\"http://mangafox.me/search/genres/", ">", "<");
 
         return (parseCover(html) && parseChapters(html));
     }
 
     private boolean parseCover(String html)
     {
-        String cover_url = Utils.parse(html, "<meta property=\"og:image\"", "content=\"", "\"");
+        String cover_url = Utils.parseUnique(html, "<meta property=\"og:image\"", "content=\"", "\"");
         if (!"".equals(cover_url))
         {
             InputStream in = Utils.getInputStreamFromURL(cover_url);
@@ -102,6 +106,29 @@ public class FoxManga implements Manga
 
     private boolean parseChapters(String html)
     {
+        //<h3> are not used because some manga also use <h4>
+        for (String str : Utils.parseMultiple(html, "<a class=\"edit\" href=\"", "<h", "</h"))
+        {
+            String url = Utils.parseUnique(str, "<a href=\"", "\"", "\"");
+            String name = Utils.parseUnique(str, "<span class=\"title nowrap\">", ">", "<");
+            if (name == null || "".equals(name))
+                name = Utils.parseUnique(str, "<a href=\"", ">", "<");
+            chapters.add(new FoxChapter(name, url));
+        }
+        //Don't forget to add this line or bad thing will happened (meteorite and laser T-Rex etc..)
+        linkChaptersTogether();
+
         return (true);
+    }
+
+    private void linkChaptersTogether()
+    {
+        for (int i = 0; i < chapters.size(); ++i)
+        {
+            if (i != 0)
+                ((FoxChapter)chapters.get(i)).previous_chapter = chapters.get(i - 1);
+            if (i + 1 != chapters.size())
+                ((FoxChapter)chapters.get(i)).next_chapter = chapters.get(i + 1);
+        }
     }
 }

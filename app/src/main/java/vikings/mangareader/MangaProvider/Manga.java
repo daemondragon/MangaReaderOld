@@ -36,6 +36,12 @@ public interface Manga
     String summary();
 
     /**
+     * Get a list of all genres.
+     * @return a list of genre. An empty list is returned if no genre is provided.
+     */
+    List<String> genres();
+
+    /**
      * Get the cover of the manga.
      * @return the cover, or null if none is found.
      */
