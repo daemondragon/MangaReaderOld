@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Is used to navigate or search between mangas
  */
-interface MangaProvider
+public interface MangaProvider
 {
     /**
      * Load the manga provider to have all starting information.

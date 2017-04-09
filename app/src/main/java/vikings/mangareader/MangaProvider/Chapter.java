@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 /**
  * Is used to handle a variable number of page.
  */
-interface Chapter
+public interface Chapter
 {
     /**
      * Load the chapter to have all information about it.

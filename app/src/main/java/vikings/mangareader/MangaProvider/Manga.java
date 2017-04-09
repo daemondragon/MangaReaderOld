@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Contain all information about the manga.
  */
-interface Manga
+public interface Manga
 {
     /**
      * Load the manga to have all information about it.

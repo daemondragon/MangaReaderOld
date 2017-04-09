@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 /**
  * Contain only a page as well as previous and next one.
  */
-interface Page
+public interface Page
 {
     /**
      * Load the page to have all information about it.
