@@ -18,7 +18,6 @@ class FoxPage implements Page
 
     FoxPage(String url)
     {
-        Log.d("FoxPage constructor", url);
         this.url = url;
     }
 
@@ -37,6 +36,12 @@ class FoxPage implements Page
 
             }
         }).start();
+    }
+
+    public void unload()
+    {
+        Log.d("unload", url);
+        picture = null;
     }
 
     private boolean parsePage(String html)

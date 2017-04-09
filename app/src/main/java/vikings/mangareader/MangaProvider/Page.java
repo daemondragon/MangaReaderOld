@@ -16,6 +16,11 @@ public interface Page
     void load(@Nullable Runnable success, @Nullable Runnable error);
 
     /**
+     * Unload non important information to save memory space
+     */
+    void unload();
+
+    /**
      * Check if page has a previous one
      * @return true if there is a previous page, false otherwise
      */
