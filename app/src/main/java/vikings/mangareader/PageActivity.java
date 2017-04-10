@@ -3,6 +3,7 @@ package vikings.mangareader;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -19,6 +20,7 @@ public class PageActivity extends Activity
     static Chapter chapter;
 
     private Page page;
+
     private GestureDetector detector;
 
     public void onCreate(Bundle savedInstanceBundle)
@@ -111,6 +113,11 @@ public class PageActivity extends Activity
         });
     }
 
+    private void setPicture(Drawable picture)
+    {
+        ((ImageView)findViewById(R.id.manga_page)).setImageDrawable(picture);
+    }
+
     private void goToPage(final Page page)
     {
         if (page != null)
@@ -128,7 +135,7 @@ public class PageActivity extends Activity
                         PageActivity.this.page.unload();
 
                     PageActivity.this.page = page;
-                    ((ImageView)findViewById(R.id.manga_page)).setImageDrawable(page.getPicture());
+                    setPicture(page.getPicture());
 
                     if (loading != null)
                         loading.setVisibility(View.INVISIBLE);

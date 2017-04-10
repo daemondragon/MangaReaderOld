@@ -1,25 +1,10 @@
 package vikings.mangareader.MangaProvider;
 
-
-import android.support.annotation.Nullable;
-
 /**
  * Is used to handle a variable number of page.
  */
-public interface Chapter
+public interface Chapter extends Loadable
 {
-    /**
-     * Load the chapter to have all information about it.
-     * @param success will be called if the loading is a success
-     * @param error will be called if an error occurred.
-     */
-    void load(@Nullable Runnable success, @Nullable Runnable error);
-
-    /**
-     * Unload all non important information
-     */
-    void unload();
-
     /**
      * Get the name of the chapter.
      * @return the name, or null if nothing could be found.

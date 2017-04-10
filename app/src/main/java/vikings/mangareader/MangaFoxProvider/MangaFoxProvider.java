@@ -14,6 +14,8 @@ import vikings.mangareader.MangaProvider.MangaProvider;
 public class MangaFoxProvider implements MangaProvider
 {
     private ArrayList<Manga> mangas_list = new ArrayList<>();
+    private boolean loaded = false;
+
     public void load(final @Nullable Runnable success, final @Nullable Runnable error)
     {
         new Thread(new Runnable()
@@ -23,7 +25,15 @@ public class MangaFoxProvider implements MangaProvider
             {
                 Handler handler = new Handler(Looper.getMainLooper());
                 if (parseNewMangas(Utils.InputStreamToString(Utils.getInputStreamFromURL("http://mangafox.me/releases/"))))
-                    handler.post(success);
+                    handler.post(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            loaded = true;
+                            success.run();
+                        }
+                    });
                 else
                     handler.post(error);
             }
@@ -33,6 +43,12 @@ public class MangaFoxProvider implements MangaProvider
     public void unload()
     {
         mangas_list.clear();
+        loaded = false;
+    }
+
+    public boolean isLoaded()
+    {
+        return (loaded);
     }
 
     public List<Manga> mangas()

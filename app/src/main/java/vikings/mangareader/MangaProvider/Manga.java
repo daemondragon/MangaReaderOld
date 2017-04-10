@@ -8,20 +8,8 @@ import java.util.List;
 /**
  * Contain all information about the manga.
  */
-public interface Manga
+public interface Manga extends Loadable
 {
-    /**
-     * Load the manga to have all information about it.
-     * @param success will be called if the loading is a success
-     * @param error will be called if an error occurred.
-     */
-    void load(@Nullable Runnable success, @Nullable Runnable error);
-
-    /**
-     * Unload all non important information
-     */
-    void unload();
-
     /**
      * Get the name of the manga.
      * @return the name, or null if none is found.

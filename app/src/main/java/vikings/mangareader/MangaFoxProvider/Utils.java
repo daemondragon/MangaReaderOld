@@ -19,7 +19,6 @@ public class Utils
             Log.d("getInputStreamFromURL", "null url provided");
             return (null);
         }
-
         try
         {
             Log.d("getInputStreamFromURL", url);

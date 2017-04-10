@@ -43,6 +43,11 @@ class FoxPage implements Page
         picture = null;
     }
 
+    public boolean isLoaded()
+    {
+        return (picture != null);
+    }
+
     private boolean parsePage(String html)
     {
         if (html == null)
