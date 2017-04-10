@@ -30,7 +30,12 @@ public class MangaFoxProvider implements MangaProvider
         }).start();
     }
 
-    public List<Manga> getNewMangas()
+    public void unload()
+    {
+        mangas_list.clear();
+    }
+
+    public List<Manga> mangas()
     {
         return (mangas_list);
     }

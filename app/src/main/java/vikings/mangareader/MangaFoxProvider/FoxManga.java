@@ -13,7 +13,7 @@ import java.util.List;
 import vikings.mangareader.MangaProvider.Chapter;
 import vikings.mangareader.MangaProvider.Manga;
 
-public class FoxManga implements Manga
+class FoxManga implements Manga
 {
     private String url = null;
     private String name = null;
@@ -23,7 +23,7 @@ public class FoxManga implements Manga
     private List<String> genres = new ArrayList<>();
     private ArrayList<Chapter> chapters = new ArrayList<>();
 
-    public FoxManga(String name, String url)
+    FoxManga(String name, String url)
     {
         this.name = name;
         this.url = url;
@@ -43,6 +43,13 @@ public class FoxManga implements Manga
                     handler.post(error);
             }
         }).start();
+    }
+
+    public void unload()
+    {
+        chapters.clear();
+        summary = null;
+        cover = null;
     }
 
     public String name()

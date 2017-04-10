@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import vikings.mangareader.MangaProvider.Chapter;
 import vikings.mangareader.MangaProvider.Page;
@@ -72,6 +74,9 @@ public class PageActivity extends Activity
             @Override
             public void run()
             {
+                if (PageActivity.chapter != null && PageActivity.chapter != chapter)
+                    PageActivity.chapter.unload();
+
                 PageActivity.chapter = chapter;
                 after.run();
             }
@@ -110,6 +115,10 @@ public class PageActivity extends Activity
     {
         if (page != null)
         {
+            final TextView loading = (TextView)findViewById(R.id.loading_tag);
+            if (loading != null)
+                loading.setVisibility(View.VISIBLE);
+
             page.load(new Runnable()
             {//Success
                 @Override
@@ -120,6 +129,9 @@ public class PageActivity extends Activity
 
                     PageActivity.this.page = page;
                     ((ImageView)findViewById(R.id.manga_page)).setImageDrawable(page.getPicture());
+
+                    if (loading != null)
+                        loading.setVisibility(View.INVISIBLE);
                 }
             }, new Runnable()
             {//Failure

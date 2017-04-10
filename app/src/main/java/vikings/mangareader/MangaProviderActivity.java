@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -40,7 +39,7 @@ public class MangaProviderActivity extends Activity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    final Manga manga = provider.getNewMangas().get(position);
+                    final Manga manga = provider.mangas().get(position);
                     manga.load(new Runnable()
                         {//Success
                             @Override
@@ -70,7 +69,7 @@ public class MangaProviderActivity extends Activity
 
     private void loadMangasList(@NonNull ListView manga_list_view)
     {
-        List<Manga> mangas = provider.getNewMangas();
+        List<Manga> mangas = provider.mangas();
         ArrayList<String> mangas_name = new ArrayList<>();
         for (Manga manga : mangas)
         {

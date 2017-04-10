@@ -40,7 +40,6 @@ class FoxPage implements Page
 
     public void unload()
     {
-        Log.d("unload", url);
         picture = null;
     }
 

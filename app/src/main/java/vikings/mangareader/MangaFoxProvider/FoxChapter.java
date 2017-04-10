@@ -1,10 +1,8 @@
 package vikings.mangareader.MangaFoxProvider;
 
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import vikings.mangareader.MangaProvider.Chapter;
 import vikings.mangareader.MangaProvider.Page;
@@ -41,6 +39,12 @@ class FoxChapter implements Chapter
                     handler.post(error);
             }
         }).start();
+    }
+
+    public void unload()
+    {
+        first_page = null;
+        last_page = null;
     }
 
     private boolean parseChapter()

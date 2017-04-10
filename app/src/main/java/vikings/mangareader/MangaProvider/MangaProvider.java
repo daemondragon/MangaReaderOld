@@ -17,10 +17,15 @@ public interface MangaProvider
     void load(@Nullable Runnable success, @Nullable Runnable error);
 
     /**
+     * Unload all non important information
+     */
+    void unload();
+
+    /**
      * Get a list of new mangas.
      * @return all new mangas, or null if an error occurred.
      */
-    List<Manga> getNewMangas();
+    List<Manga> mangas();
 
     //Search option will be added later, as well as login etc...
 }

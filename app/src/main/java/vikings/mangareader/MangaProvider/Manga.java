@@ -18,6 +18,11 @@ public interface Manga
     void load(@Nullable Runnable success, @Nullable Runnable error);
 
     /**
+     * Unload all non important information
+     */
+    void unload();
+
+    /**
      * Get the name of the manga.
      * @return the name, or null if none is found.
      */

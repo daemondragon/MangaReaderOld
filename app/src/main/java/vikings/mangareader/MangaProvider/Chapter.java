@@ -16,6 +16,11 @@ public interface Chapter
     void load(@Nullable Runnable success, @Nullable Runnable error);
 
     /**
+     * Unload all non important information
+     */
+    void unload();
+
+    /**
      * Get the name of the chapter.
      * @return the name, or null if nothing could be found.
      */
