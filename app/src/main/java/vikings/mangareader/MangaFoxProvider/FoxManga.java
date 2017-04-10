@@ -134,10 +134,12 @@ class FoxManga implements Manga
         for (String str : Utils.parseMultiple(html, "<a class=\"edit\" href=\"", "<h", "</h"))
         {
             String url = Utils.parseUnique(str, "<a href=\"", "\"", "\"");
+
+            String chapter_number =  Utils.parseUnique(str, "<a href=\"", ">", "<").trim();
+            chapter_number = "Chapter" + chapter_number.substring(chapter_number.lastIndexOf(" "));
+
             String name = Utils.parseUnique(str, "<span class=\"title nowrap\">", ">", "<");
-            if (name == null || "".equals(name))
-                name = Utils.parseUnique(str, "<a href=\"", ">", "<");
-            chapters.add(new FoxChapter(name, url));
+            chapters.add(new FoxChapter(name == null ? chapter_number : chapter_number + " " + name, url));
         }
         //Don't forget to add this line or bad thing will happened (meteorite and laser T-Rex etc..)
         linkChaptersTogether();

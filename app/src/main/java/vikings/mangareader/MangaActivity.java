@@ -54,8 +54,7 @@ public class MangaActivity extends Activity
                         @Override
                         public void run()
                         {
-                            PageActivity.chapter = chapter;
-                            startActivity(new Intent(MangaActivity.this, PageActivity.class));
+                            PageActivity.start(MangaActivity.this, chapter);
                         }
                     }, new Runnable()
                     {//Failure

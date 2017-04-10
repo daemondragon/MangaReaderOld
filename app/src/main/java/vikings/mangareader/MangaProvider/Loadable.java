@@ -3,7 +3,7 @@ package vikings.mangareader.MangaProvider;
 /**
  * Used to save memory
  */
-interface Loadable
+public interface Loadable
 {
     /**
      * Load the page to have all information about it.
@@ -16,10 +16,4 @@ interface Loadable
      * Unload non important information to save memory space
      */
     void unload();
-
-    /**
-     * Check if it is loaded or not
-     * @return true if it is loaded, false otherwise
-     */
-    boolean isLoaded();
 }

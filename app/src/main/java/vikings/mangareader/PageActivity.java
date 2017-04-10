@@ -2,7 +2,9 @@ package vikings.mangareader;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import vikings.mangareader.MangaProvider.Chapter;
@@ -17,11 +20,19 @@ import vikings.mangareader.MangaProvider.Page;
 
 public class PageActivity extends Activity
 {
-    static Chapter chapter;
+    private static Chapter chapter;
 
-    private Page page;
-
+    private Page current_page;
     private GestureDetector detector;
+
+    public static void start(Context context, Chapter chapter)
+    {
+        if (chapter == null)
+            return;
+
+        PageActivity.chapter = chapter;
+        context.startActivity(new Intent(context, PageActivity.class));
+    }
 
     public void onCreate(Bundle savedInstanceBundle)
     {
@@ -35,15 +46,22 @@ public class PageActivity extends Activity
             @Override
             public void run()
             {
-                goToPage(chapter.getFirstPage());
+                loadPage(chapter.getFirstPage(), new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        goToPage(chapter.getFirstPage());
+                    }
+                });
             }
         });
     }
 
-    public boolean onTouchEvent(MotionEvent e)
+    public boolean dispatchTouchEvent(MotionEvent e)
     {
         detector.onTouchEvent(e);
-        return (super.onTouchEvent(e));
+        return (super.dispatchTouchEvent(e));
     }
 
     public void init()
@@ -113,8 +131,43 @@ public class PageActivity extends Activity
         });
     }
 
+    private void loadPage(final Page page, final Runnable success)
+    {
+        if (page == null)
+            return;
+
+        page.load(success, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
+                builder.setTitle(R.string.error)
+                        .setMessage(R.string.no_internet_connection)
+                        .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                loadPage(page, success);
+                            }
+                        })
+                        .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                finish();
+                            }
+                        });
+                builder.create().show();
+            }
+        });
+    }
+
     private void setPicture(Drawable picture)
     {
+        ((ScrollView)findViewById(R.id.manga_page_scroll)).fullScroll(ScrollView.FOCUS_UP);
         ((ImageView)findViewById(R.id.manga_page)).setImageDrawable(picture);
     }
 
@@ -126,46 +179,15 @@ public class PageActivity extends Activity
             if (loading != null)
                 loading.setVisibility(View.VISIBLE);
 
-            page.load(new Runnable()
-            {//Success
+            loadPage(page, new Runnable() {
                 @Override
                 public void run()
                 {
-                    if (PageActivity.this.page != null)
-                        PageActivity.this.page.unload();
-
-                    PageActivity.this.page = page;
+                    current_page = page;
                     setPicture(page.getPicture());
 
                     if (loading != null)
                         loading.setVisibility(View.INVISIBLE);
-                }
-            }, new Runnable()
-            {//Failure
-                @Override
-                public void run()
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
-                    builder.setTitle(R.string.error)
-                            .setMessage(R.string.no_internet_connection)
-                            .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    goToPage(page);
-                                }
-                            })
-                            .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    finish();
-                                }
-                            });
-
-                    builder.create().show();
                 }
             });
         }
@@ -178,8 +200,8 @@ public class PageActivity extends Activity
 
     private void goToNextPage()
     {
-        if (page.hasNext())
-            goToPage(page.next());
+        if (current_page.hasNext())
+            goToPage(current_page.next());
         else
         {
             final Chapter next_chapter =  chapter.getNextChapter();
@@ -201,8 +223,8 @@ public class PageActivity extends Activity
 
     private void goToPreviousPage()
     {
-        if (page.hasPrevious())
-            goToPage(page.previous());
+        if (current_page.hasPrevious())
+            goToPage(current_page.previous());
         else
         {
             final Chapter previous_chapter =  chapter.getPreviousChapter();
