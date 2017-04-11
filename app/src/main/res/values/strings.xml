@@ -7,6 +7,8 @@
     <string name="authors">Authors</string>
     <string name="name">Name</string>
     <string name="genres">Genres</string>
+    <string name="status">Status</string>
+    <string name="rating">Rating</string>
 
     <!--  Errors string  -->
     <string name="error">Error!</string>
@@ -16,5 +18,5 @@
 
     <string name="retry">Retry</string>
     <string name="back">Back</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
 </resources>

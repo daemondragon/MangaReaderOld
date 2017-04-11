@@ -61,6 +61,34 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="@string/status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"/>
+                <TextView
+                    android:id="@+id/manga_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="@string/rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"/>
+                <TextView
+                    android:id="@+id/manga_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </TableRow>
         </TableLayout>
 
         <RelativeLayout

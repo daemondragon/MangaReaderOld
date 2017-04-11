@@ -29,6 +29,18 @@ public interface Manga extends Loadable
     String summary();
 
     /**
+     * Get the status of the manga.
+     * @return the status or null if none is provided.
+     */
+    String status();
+
+    /**
+     * Get the rating of the manga, between 0 (worst mark) and 1 (best mark)
+     * @return
+     */
+    float rating();
+
+    /**
      * Get a list of all genres.
      * @return a list of genre. An empty list is returned if no genre is provided.
      */

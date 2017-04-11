@@ -19,6 +19,8 @@ class FoxManga implements Manga
     private String name = null;
     private String authors = null;
     private String summary = null;
+    private String status = null;
+    private float rating = 0.f;
     private static Drawable cover = null;
     private List<String> genres = new ArrayList<>();
     private ArrayList<Chapter> chapters = new ArrayList<>();
@@ -68,6 +70,16 @@ class FoxManga implements Manga
         return (summary);
     }
 
+    public String status()
+    {
+        return (status);
+    }
+
+    public float rating()
+    {
+        return (rating);
+    }
+
     public List<String> genres() { return (genres); }
 
     public Drawable cover()
@@ -89,7 +101,30 @@ class FoxManga implements Manga
         authors = Utils.parseUnique(html, "href=\"/search/artist/", ">", "<");
         genres = Utils.parseMultiple(html, "<a href=\"http://mangafox.me/search/genres/", ">", "<");
 
+        parseStatusAndRating(html);
+
         return (parseCover(html) && parseChapters(html));
+    }
+
+    private void parseStatusAndRating(String html)
+    {
+        status = Utils.parseUnique(html, "<h5>Status", "<span>", "<i>");
+        if (status != null)
+        {
+            int comma = status.indexOf(",");
+            if (comma != -1)
+                status = status.substring(0, comma);
+
+            status = status.trim();
+        }
+
+        String rating_str = Utils.parseUnique(html, "<h5>Rating:</h5>", "<span>", "</span>");
+        if (rating_str != null)
+        {
+            int start = rating_str.indexOf(" ") + 1;
+            int end = rating_str.indexOf(" ", start);
+            rating = Float.valueOf(rating_str.substring(start, end)) / 5.f;
+        }
     }
 
     private boolean parseCover(String html)

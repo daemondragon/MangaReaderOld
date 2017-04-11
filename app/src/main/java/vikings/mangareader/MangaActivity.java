@@ -88,6 +88,8 @@ public class MangaActivity extends Activity
         ((TextView)findViewById(R.id.manga_name)).setText(manga.name());
         ((TextView)findViewById(R.id.manga_authors)).setText(manga.authors());
         ((TextView)findViewById(R.id.manga_summary)).setText(manga.summary());
+        ((TextView)findViewById(R.id.manga_rating)).setText((manga.rating() * 5) + " / 5 stars");
+        ((TextView)findViewById(R.id.manga_status)).setText(manga.status());
         ((TextView)findViewById(R.id.manga_genres)).setText(manga.genres().toString());
         ((ImageView)findViewById(R.id.manga_cover)).setImageDrawable(manga.cover());
 
