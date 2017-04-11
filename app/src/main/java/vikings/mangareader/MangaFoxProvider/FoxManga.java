@@ -23,7 +23,6 @@ class FoxManga implements Manga
     private List<String> genres = new ArrayList<>();
     private ArrayList<Chapter> chapters = new ArrayList<>();
 
-    private boolean loaded = false;
 
     FoxManga(String name, String url)
     {
@@ -40,15 +39,7 @@ class FoxManga implements Manga
             {
                 Handler handler = new Handler(Looper.getMainLooper());
                 if (parseMangaInfo(Utils.InputStreamToString(Utils.getInputStreamFromURL(url))))
-                    handler.post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            loaded = true;
-                            success.run();
-                        }
-                    });
+                    handler.post(success);
                 else
                     handler.post(error);
             }
@@ -60,13 +51,6 @@ class FoxManga implements Manga
         chapters.clear();
         summary = null;
         cover = null;
-
-        loaded = false;
-    }
-
-    public boolean isLoaded()
-    {
-        return (loaded);
     }
 
     public String name()

@@ -39,28 +39,9 @@ public class MangaProviderActivity extends Activity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    final Manga manga = provider.mangas().get(position);
-                    manga.load(new Runnable()
-                        {//Success
-                            @Override
-                            public void run()
-                            {
-                                MangaActivity.manga = manga;
-                                startActivity(new Intent(MangaProviderActivity.this, MangaActivity.class));
-                            }
-                        }, new Runnable()
-                        {//Failure
-                            @Override
-                            public void run()
-                            {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(MangaProviderActivity.this);
-                                builder.setTitle(R.string.error)
-                                        .setMessage(R.string.no_internet_connection)
-                                        .setPositiveButton(R.string.ok, null);
+                    MangaActivity.manga = provider.mangas().get(position);;
+                    startActivity(new Intent(MangaProviderActivity.this, MangaActivity.class));
 
-                                builder.create().show();
-                            }
-                        });
                 }
             });
             loadMangasList(list);

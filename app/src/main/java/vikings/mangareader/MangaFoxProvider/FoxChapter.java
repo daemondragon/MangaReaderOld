@@ -19,8 +19,6 @@ class FoxChapter implements Chapter
     Chapter previous_chapter = null;
     Chapter next_chapter = null;
 
-    private boolean loaded = false;
-
     FoxChapter(String name, String url)
     {
         this.name = name;
@@ -36,15 +34,7 @@ class FoxChapter implements Chapter
             {
                 Handler handler = new Handler(Looper.getMainLooper());
                 if (parseChapter())
-                    handler.post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            loaded = true;
-                            success.run();
-                        }
-                    });
+                    handler.post(success);
                 else
                     handler.post(error);
             }
@@ -55,12 +45,6 @@ class FoxChapter implements Chapter
     {
         first_page = null;
         last_page = null;
-        loaded = false;
-    }
-
-    public boolean isLoaded()
-    {
-        return (loaded);
     }
 
     private boolean parseChapter()

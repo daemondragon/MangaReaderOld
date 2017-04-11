@@ -25,15 +25,7 @@ public class MangaFoxProvider implements MangaProvider
             {
                 Handler handler = new Handler(Looper.getMainLooper());
                 if (parseNewMangas(Utils.InputStreamToString(Utils.getInputStreamFromURL("http://mangafox.me/releases/"))))
-                    handler.post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            loaded = true;
-                            success.run();
-                        }
-                    });
+                    handler.post(success);
                 else
                     handler.post(error);
             }
@@ -43,12 +35,6 @@ public class MangaFoxProvider implements MangaProvider
     public void unload()
     {
         mangas_list.clear();
-        loaded = false;
-    }
-
-    public boolean isLoaded()
-    {
-        return (loaded);
     }
 
     public List<Manga> mangas()

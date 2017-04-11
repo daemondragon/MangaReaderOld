@@ -167,8 +167,19 @@ public class PageActivity extends Activity
 
     private void setPicture(Drawable picture)
     {
-        ((ScrollView)findViewById(R.id.manga_page_scroll)).fullScroll(ScrollView.FOCUS_UP);
-        ((ImageView)findViewById(R.id.manga_page)).setImageDrawable(picture);
+        if (picture != null)
+        {
+            ((ScrollView) findViewById(R.id.manga_page_scroll)).fullScroll(ScrollView.FOCUS_UP);
+            ((ImageView) findViewById(R.id.manga_page)).setImageDrawable(picture);
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
+            builder.setTitle(R.string.error)
+                    .setMessage(R.string.picture_loading_error)
+                    .setPositiveButton(R.string.ok, null);
+            builder.create().show();
+        }
     }
 
     private void goToPage(final Page page)

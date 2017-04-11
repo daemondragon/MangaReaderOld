@@ -6,7 +6,8 @@
     <ScrollView
         android:id="@+id/manga_page_scroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true">
         <ImageView
             android:id="@+id/manga_page"
             android:layout_width="match_parent"

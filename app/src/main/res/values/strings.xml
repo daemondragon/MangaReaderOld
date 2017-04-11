@@ -2,10 +2,16 @@
     <string name="app_name">MangaReader</string>
 
     <string name="loading">Loading&#8230;</string>
+    <string name="show_summary">Show summary</string>
+
+    <string name="authors">Authors</string>
+    <string name="name">Name</string>
+    <string name="genres">Genres</string>
 
     <!--  Errors string  -->
     <string name="error">Error!</string>
     <string name="no_internet_connection">Can\'t connect to the website</string>
+    <string name="picture_loading_error">Picture is too big to fit in memory</string>
     <string name="offline_mode">Offline mode</string>
 
     <string name="retry">Retry</string>
