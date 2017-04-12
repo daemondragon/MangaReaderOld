@@ -3,7 +3,7 @@
 
     <string name="loading">Loading&#8230;</string>
 
-    <!--  Errors string  -->
+    <!--  Errors strings  -->
     <string name="error">Error!</string>
     <string name="no_internet_connection">Can\'t connect to the website</string>
     <string name="offline_mode">Offline mode</string>
@@ -11,4 +11,12 @@
     <string name="retry">Retry</string>
     <string name="back">Back</string>
     <string name="ok">Ok</string>
+
+    <!--  toolbar strings  -->
+    <string name="log_in">Log in</string>
+    <string name="log_out">Log out</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="search">Search</string>
+    <string name="advanced">Advanced</string>
+    <string name="settings">Settings</string>
 </resources>
