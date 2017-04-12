@@ -11,7 +11,7 @@ import vikings.mangareader.MangaProvider.Page;
 class FoxPage implements Page
 {
     private String url;
-    private Drawable picture = null;
+    private static Drawable picture = null;
 
     private Page previous_page = null;
     private Page next_page = null;
@@ -40,7 +40,6 @@ class FoxPage implements Page
 
     public void unload()
     {
-        picture = null;
     }
 
     private boolean parsePage(String html)
@@ -48,9 +47,16 @@ class FoxPage implements Page
         if (html == null)
             return (false);
 
-        picture = Drawable.createFromStream(
-                Utils.getInputStreamFromURL(Utils.parseUnique(html, "<div class=\"read_img\">", "<img src=\"", "\"")),
-                "page");
+        try
+        {
+            picture = Drawable.createFromStream(
+                    Utils.getInputStreamFromURL(Utils.parseUnique(html, "<div class=\"read_img\">", "<img src=\"", "\"")),
+                    "page");
+        }
+        catch (OutOfMemoryError e)
+        {
+            picture = null;
+        }
 
         parseNextButton(html);
         parsePreviousButton(html);

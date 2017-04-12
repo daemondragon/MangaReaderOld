@@ -7,25 +7,26 @@ import java.util.List;
 /**
  * Is used to navigate or search between mangas
  */
-public interface MangaProvider
+public interface MangaProvider extends Loadable
 {
     /**
-     * Load the manga provider to have all starting information.
-     * @param success will be called if the loading is a success
-     * @param error will be called if an error occurred.
-     */
-    void load(@Nullable Runnable success, @Nullable Runnable error);
-
-    /**
-     * Unload all non important information
-     */
-    void unload();
-
-    /**
-     * Get a list of new mangas.
-     * @return all new mangas, or null if an error occurred.
+     * Get a list of mangas.
+     * @return all mangas, or null if an error occurred.
      */
     List<Manga> mangas();
 
-    //Search option will be added later, as well as login etc...
+    /**
+     * Get all supported genres used for the search function.
+     * @return all genres supported.
+     */
+    List<String>    getAllGenres();
+
+    /**
+     * Search the manga in the given genre.
+     * @param manga_name the manga name.
+     * @param in_genre all desired genre. If null is provided, no genre is specified.
+     * @param success will be called is the search happened correctly.
+     * @param error will be called if an error occured.
+     */
+    void search(String manga_name, @Nullable List<String> in_genre, Runnable success, Runnable error);
 }

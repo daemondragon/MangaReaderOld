@@ -52,28 +52,9 @@ public class MangaProviderActivity extends AppCompatActivity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    final Manga manga = provider.mangas().get(position);
-                    manga.load(new Runnable()
-                        {//Success
-                            @Override
-                            public void run()
-                            {
-                                MangaActivity.manga = manga;
-                                startActivity(new Intent(MangaProviderActivity.this, MangaActivity.class));
-                            }
-                        }, new Runnable()
-                        {//Failure
-                            @Override
-                            public void run()
-                            {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(MangaProviderActivity.this);
-                                builder.setTitle(R.string.error)
-                                        .setMessage(R.string.no_internet_connection)
-                                        .setPositiveButton(R.string.ok, null);
+                    MangaActivity.manga = provider.mangas().get(position);;
+                    startActivity(new Intent(MangaProviderActivity.this, MangaActivity.class));
 
-                                builder.create().show();
-                            }
-                        });
                 }
             });
             loadMangasList(list);
@@ -126,14 +107,40 @@ public class MangaProviderActivity extends AppCompatActivity
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onQueryTextSubmit(String query) {
+                provider.search(searchView.getQuery().toString(), null, new Runnable() {
+                    @Override
+                    public void run() {
+                        loadMangasList((ListView) findViewById(R.id.manga_list));
+                    }
+                }, new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MangaProviderActivity.this);
+                        builder.setTitle(R.string.error)
+                                .setMessage(R.string.no_internet_connection)
+                                .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
 
+                                    }
+                                });
+                        builder.create().show();
+                    }
+                });
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
             }
         });
-
         return true;
     }
 }
