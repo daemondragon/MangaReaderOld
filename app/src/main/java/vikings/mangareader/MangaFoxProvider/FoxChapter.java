@@ -5,23 +5,14 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 
 import vikings.mangareader.MangaProvider.Chapter;
-import vikings.mangareader.MangaProvider.Page;
 
-class FoxChapter implements Chapter
+class FoxChapter extends Chapter
 {
     private String url;
-    private String name;
-    private String release;
-
-    private Page first_page = null;
-    private Page last_page = null;
-
-    Chapter previous_chapter = null;
-    Chapter next_chapter = null;
 
     FoxChapter(String name, String url)
     {
-        this.name = name;
+        super(name);
         this.url = url;
     }
 
@@ -51,35 +42,5 @@ class FoxChapter implements Chapter
     {
         first_page = new FoxPage(url);
         return (true);
-    }
-
-    public String name()
-    {
-        return (name);
-    }
-
-    public String release()
-    {
-        return (release);
-    }
-
-    public Page getFirstPage()
-    {
-        return (first_page);
-    }
-
-    public Page getLastPage()
-    {
-        return (last_page);
-    }
-
-    public Chapter getNextChapter()
-    {
-        return (next_chapter);
-    }
-
-    public Chapter getPreviousChapter()
-    {
-        return (previous_chapter);
     }
 }

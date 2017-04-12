@@ -8,28 +8,20 @@ import android.util.Log;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
-import vikings.mangareader.MangaProvider.Chapter;
 import vikings.mangareader.MangaProvider.Manga;
 
-class FoxManga implements Manga
+class FoxManga extends Manga
 {
     private String url = null;
-    private String name = null;
-    private String authors = null;
-    private String summary = null;
-    private String status = null;
-    private float rating = 0.f;
-    private static Drawable cover = null;
-    private List<String> genres = new ArrayList<>();
-    private ArrayList<Chapter> chapters = new ArrayList<>();
-
 
     FoxManga(String name, String url)
     {
-        this.name = name;
+        super(name);
         this.url = url;
+
+        genres = new ArrayList<>();
+        chapters = new ArrayList<>();
     }
 
     public void load(final @Nullable Runnable success, final @Nullable Runnable error)
@@ -53,43 +45,6 @@ class FoxManga implements Manga
         chapters.clear();
         summary = null;
         cover = null;
-    }
-
-    public String name()
-    {
-        return (name);
-    }
-
-    public String authors()
-    {
-        return (authors);
-    }
-
-    public String summary()
-    {
-        return (summary);
-    }
-
-    public String status()
-    {
-        return (status);
-    }
-
-    public float rating()
-    {
-        return (rating);
-    }
-
-    public List<String> genres() { return (genres); }
-
-    public Drawable cover()
-    {
-        return (cover);
-    }
-
-    public List<Chapter> chapters()
-    {
-        return (chapters);
     }
 
     private boolean parseMangaInfo(String html)
@@ -161,6 +116,8 @@ class FoxManga implements Manga
             chapters.add(new FoxChapter(name == null ? chapter_number : chapter_number + " " + name, url));
         }
         //Don't forget to add this line or bad thing will happened (meteorite and laser T-Rex etc..)
+
+        //TODO : improve link chapters
         linkChaptersTogether();
 
         return (true);
@@ -168,6 +125,7 @@ class FoxManga implements Manga
 
     private void linkChaptersTogether()
     {
+        /*
         for (int i = 0; i < chapters.size(); ++i)
         {
             if (i != 0)
@@ -175,5 +133,6 @@ class FoxManga implements Manga
             if (i + 1 != chapters.size())
                 ((FoxChapter)chapters.get(i)).previous_chapter = chapters.get(i + 1);
         }
+        */
     }
 }

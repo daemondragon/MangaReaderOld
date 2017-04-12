@@ -5,21 +5,31 @@ import android.support.annotation.Nullable;
 import java.util.List;
 
 /**
- * Is used to navigate or search between mangas
+ * Is used to navigate or search between mangas.
+ * No fields are supposed to be non null before load is called.
  */
-public interface MangaProvider extends Loadable
+public abstract class MangaProvider implements Loadable
 {
+    protected List<Manga> mangas = null;
+    protected List<String> genres_supported = null;
+
     /**
      * Get a list of mangas.
      * @return all mangas, or null if an error occurred.
      */
-    List<Manga> mangas();
+    public List<Manga> mangas()
+    {
+        return (mangas);
+    }
 
     /**
      * Get all supported genres used for the search function.
      * @return all genres supported.
      */
-    List<String>    getAllGenres();
+    public List<String> getAllGenres()
+    {
+        return (genres_supported);
+    }
 
     /**
      * Search the manga in the given genre.
@@ -28,5 +38,5 @@ public interface MangaProvider extends Loadable
      * @param success will be called is the search happened correctly.
      * @param error will be called if an error occured.
      */
-    void search(String manga_name, @Nullable List<String> in_genre, Runnable success, Runnable error);
+    public abstract void search(String manga_name, @Nullable List<String> in_genre, Runnable success, Runnable error);
 }

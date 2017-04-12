@@ -3,23 +3,24 @@ package vikings.mangareader.MangaFoxProvider;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import vikings.mangareader.MangaProvider.Manga;
 import vikings.mangareader.MangaProvider.MangaProvider;
 
-public class MangaFoxProvider implements MangaProvider
+public class MangaFoxProvider extends MangaProvider
 {
-    private ArrayList<Manga> mangas_list = new ArrayList<>();
-    private ArrayList<String> genres_supported = new ArrayList<>(
-            Arrays.asList("Action", "Adult", "Adventure", "Comedy", "Doujinshi", "Drama", "Ecchi", "Fantasy", "Gender Bender", "Harem",
-                    "Historical", "Horror", "Josei", "Martial Arts", "Mature", "Mecha", "Mystery", "One Shot", "Psychological",
-                    "Romance", "School Life", "Sci-fi", "Seinen", "Shoujo", "Shoujo Ai", "Shounen", "Shounen Ai", "Slice of Life",
-                    "Smut", "Sports", "Supernatural", "Tragedy", "Webtoons", "Yaoi", "Yuri"));
+    public MangaFoxProvider()
+    {
+        mangas = new ArrayList<>();
+        genres_supported = new ArrayList<>(
+                Arrays.asList("Action", "Adult", "Adventure", "Comedy", "Doujinshi", "Drama", "Ecchi", "Fantasy", "Gender Bender", "Harem",
+                        "Historical", "Horror", "Josei", "Martial Arts", "Mature", "Mecha", "Mystery", "One Shot", "Psychological",
+                        "Romance", "School Life", "Sci-fi", "Seinen", "Shoujo", "Shoujo Ai", "Shounen", "Shounen Ai", "Slice of Life",
+                        "Smut", "Sports", "Supernatural", "Tragedy", "Webtoons", "Yaoi", "Yuri"));
+    }
 
     public void load(final @Nullable Runnable success, final @Nullable Runnable error)
     {
@@ -39,12 +40,7 @@ public class MangaFoxProvider implements MangaProvider
 
     public void unload()
     {
-        mangas_list.clear();
-    }
-
-    public List<Manga> mangas()
-    {
-        return (mangas_list);
+        mangas.clear();
     }
 
     private boolean parseNewMangas(String html)
@@ -52,7 +48,7 @@ public class MangaFoxProvider implements MangaProvider
         if (html == null || "".equals(html))
             return (false);
 
-        mangas_list.clear();
+        mangas.clear();
 
         try
         {
@@ -68,7 +64,7 @@ public class MangaFoxProvider implements MangaProvider
                 int start_name = html.indexOf(">", end_url) + 1;
                 int end_name = html.indexOf("</a>", start_name);
 
-                mangas_list.add(new FoxManga(html.substring(start_name, end_name), html.substring(start_url, end_url)));
+                mangas.add(new FoxManga(html.substring(start_name, end_name), html.substring(start_url, end_url)));
 
                 start_manga = html.indexOf("<h3 class=\"title\">", end_manga);
                 if (start_manga != -1)
@@ -80,11 +76,6 @@ public class MangaFoxProvider implements MangaProvider
         {
             return (false);
         }
-    }
-
-    public List<String> getAllGenres()
-    {
-        return (genres_supported);
     }
 
     public void search(final String manga_name, final @Nullable List<String> in_genre, final Runnable success, final Runnable error)
@@ -124,10 +115,10 @@ public class MangaFoxProvider implements MangaProvider
         if (html == null)
             return (false);
 
-        mangas_list.clear();
+        mangas.clear();
         for (String str : Utils.parseMultiple(html, "<div class=\"manga_text\">", "href=\"", "<"))
         {
-            mangas_list.add(new FoxManga(str.substring(str.indexOf(">") + 1), str.substring(0, str.indexOf("\""))));
+            mangas.add(new FoxManga(str.substring(str.indexOf(">") + 1), str.substring(0, str.indexOf("\""))));
         }
         return (true);
     }

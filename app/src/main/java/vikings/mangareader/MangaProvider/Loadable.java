@@ -3,7 +3,7 @@ package vikings.mangareader.MangaProvider;
 /**
  * Used to save memory
  */
-public interface Loadable
+interface Loadable
 {
     /**
      * Load the page to have all information about it.

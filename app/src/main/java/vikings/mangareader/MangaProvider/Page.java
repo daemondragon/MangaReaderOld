@@ -1,40 +1,58 @@
 package vikings.mangareader.MangaProvider;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 
 /**
  * Contain only a page as well as previous and next one.
+ * No field are supposed to be non null before load is called.
  */
-public interface Page extends Loadable
+public abstract class Page implements Loadable
 {
+    protected Page previous = null;
+    protected Page next = null;
+    protected Drawable picture = null;
     /**
      * Check if page has a previous one
      * @return true if there is a previous page, false otherwise
      */
-    boolean hasPrevious();
+    public boolean hasPrevious()
+    {
+        return (previous != null);
+    }
 
     /**
      * Get the next previous, hasPrevious() might not be called before this function.
      * @return the previous page if it could be loaded, null otherwise
      */
-    Page previous();
+    public Page previous()
+    {
+        return (previous);
+    }
 
     /**
      * Check if page has a next one
      * @return true if there is a next page, false otherwise
      */
-    boolean hasNext();
+    public boolean hasNext()
+    {
+        return (next != null);
+    }
 
     /**
      * Get the next page, hasNext() might not be called before this function.
      * @return the next page if it could be loaded, null otherwise
      */
-    Page next();
+    public Page next()
+    {
+        return (next);
+    }
 
     /**
      * Get the picture of the page.
      * @return the picture of the page, or null if it couldn't be loaded.
      */
-    Drawable getPicture();
+    public Drawable getPicture()
+    {
+        return (picture);
+    }
 }

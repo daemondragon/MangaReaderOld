@@ -8,13 +8,9 @@ import android.util.Log;
 
 import vikings.mangareader.MangaProvider.Page;
 
-class FoxPage implements Page
+class FoxPage extends Page
 {
     private String url;
-    private static Drawable picture = null;
-
-    private Page previous_page = null;
-    private Page next_page = null;
 
     FoxPage(String url)
     {
@@ -74,7 +70,7 @@ class FoxPage implements Page
             if (previous_page_end_url != null)
             {
                 if (!previous_page_end_url.contains("javascript") && !previous_page_end_url.contains("void"))
-                    previous_page = new FoxPage(url.substring(0, url.lastIndexOf("/") + 1) + previous_page_end_url);
+                    previous = new FoxPage(url.substring(0, url.lastIndexOf("/") + 1) + previous_page_end_url);
                 else
                     Log.d("parsePreviousButton", "no previous page (javascript or void found in string)");
             }
@@ -97,7 +93,7 @@ class FoxPage implements Page
                 if (!next_page_end_url.contains("javascript") && !next_page_end_url.contains("void") &&
                         !next_page_end_url.contains("http"))
                 {
-                    next_page = new FoxPage(url.substring(0, url.lastIndexOf("/") + 1) + next_page_end_url);
+                    next = new FoxPage(url.substring(0, url.lastIndexOf("/") + 1) + next_page_end_url);
                 }
                 else
                     Log.d("parseNextButton", "no next page (javascript or void found in string)");
@@ -107,30 +103,5 @@ class FoxPage implements Page
         }
         else
             Log.d("parseNextButton", "next button not found");
-    }
-
-    public boolean hasPrevious()
-    {
-        return (previous_page != null);
-    }
-
-    public Page previous()
-    {
-        return (previous_page);
-    }
-
-    public boolean hasNext()
-    {
-        return (next_page != null);
-    }
-
-    public Page next()
-    {
-        return (next_page);
-    }
-
-    public Drawable getPicture()
-    {
-        return (picture);
     }
 }
