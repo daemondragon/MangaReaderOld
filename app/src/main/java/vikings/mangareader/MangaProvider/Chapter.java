@@ -60,22 +60,4 @@ public abstract class Chapter implements Loadable
     {
         return (last_page);
     }
-
-    /**
-     * Get the next chapter.
-     * @return the next chapter, or null if none is provided.
-     */
-    public Chapter getNextChapter()
-    {
-        return (next);
-    }
-
-    /**
-     * Get the previous chapter.
-     * @return the previous chapter, or null if none is provided.
-     */
-    public Chapter getPreviousChapter()
-    {
-        return (previous);
-    }
 }

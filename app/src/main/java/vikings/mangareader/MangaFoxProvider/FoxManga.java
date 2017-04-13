@@ -115,24 +115,6 @@ class FoxManga extends Manga
             String name = Utils.parseUnique(str, "<span class=\"title nowrap\">", ">", "<");
             chapters.add(new FoxChapter(name == null ? chapter_number : chapter_number + " " + name, url));
         }
-        //Don't forget to add this line or bad thing will happened (meteorite and laser T-Rex etc..)
-
-        //TODO : improve link chapters
-        linkChaptersTogether();
-
         return (true);
-    }
-
-    private void linkChaptersTogether()
-    {
-        /*
-        for (int i = 0; i < chapters.size(); ++i)
-        {
-            if (i != 0)
-                ((FoxChapter)chapters.get(i)).next_chapter = chapters.get(i - 1);
-            if (i + 1 != chapters.size())
-                ((FoxChapter)chapters.get(i)).previous_chapter = chapters.get(i + 1);
-        }
-        */
     }
 }

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import vikings.mangareader.MangaProvider.Chapter;
@@ -83,14 +84,20 @@ public class MangaActivity extends Activity
         });
     }
 
+    private void setTextIn(TextView view, String text)
+    {
+            view.setText(text != null ? text : getResources().getString(R.string.unknown));
+    }
+
     private void init()
     {
-        ((TextView)findViewById(R.id.manga_name)).setText(manga.name());
-        ((TextView)findViewById(R.id.manga_authors)).setText(manga.authors());
-        ((TextView)findViewById(R.id.manga_summary)).setText(manga.summary());
-        ((TextView)findViewById(R.id.manga_rating)).setText((manga.rating() * 5) + " / 5 stars");
-        ((TextView)findViewById(R.id.manga_status)).setText(manga.status());
-        ((TextView)findViewById(R.id.manga_genres)).setText(manga.genres().toString());
+        setTextIn((TextView)findViewById(R.id.manga_name), manga.name());
+        setTextIn((TextView)findViewById(R.id.manga_authors), manga.authors());
+        setTextIn((TextView)findViewById(R.id.manga_summary), manga.summary());
+        setTextIn((TextView)findViewById(R.id.manga_rating), manga.rating() * 5 + " / 5 stars");
+        setTextIn((TextView)findViewById(R.id.manga_status), manga.status() );
+        setTextIn((TextView)findViewById(R.id.manga_genres), manga.genres().toString());
+
         ((ImageView)findViewById(R.id.manga_cover)).setImageDrawable(manga.cover());
 
         ListView chapters_list = (ListView)findViewById(R.id.manga_chapters);
@@ -103,8 +110,7 @@ public class MangaActivity extends Activity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    final Chapter chapter = manga.chapters().get(position);
-                    PageActivity.start(MangaActivity.this, chapter);
+                    PageActivity.start(MangaActivity.this, manga.chapters(), position);
                 }
             });
         }
@@ -128,6 +134,7 @@ public class MangaActivity extends Activity
     private void loadChaptersList(ListView chapters_list)
     {
         List<Chapter> chapters = manga.chapters();
+
         ArrayList<String> chapters_name = new ArrayList<>();
         for (Chapter chapter : chapters)
         {

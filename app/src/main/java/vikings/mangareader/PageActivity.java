@@ -15,22 +15,26 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import vikings.mangareader.MangaProvider.Chapter;
 import vikings.mangareader.MangaProvider.Page;
 
 public class PageActivity extends Activity
 {
-    private static Chapter chapter;
+    private static List<Chapter> chapters;
+    private static int chapter_index = -1;
 
     private Page current_page;
     private GestureDetector detector;
 
-    public static void start(Context context, Chapter chapter)
+    public static void start(Context context, List<Chapter> chapters, int chapter_index)
     {
-        if (chapter == null)
+        if (chapters == null || chapter_index < 0 || chapter_index >= chapters.size())
             return;
 
-        PageActivity.chapter = chapter;
+        PageActivity.chapters = chapters;
+        PageActivity.chapter_index = chapter_index;
         context.startActivity(new Intent(context, PageActivity.class));
     }
 
@@ -41,19 +45,12 @@ public class PageActivity extends Activity
 
         init();
 
-        loadChapter(chapter, new Runnable()
+        loadChapter(chapter_index, new Runnable()
         {
             @Override
             public void run()
             {
-                loadPage(chapter.getFirstPage(), new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        goToPage(chapter.getFirstPage());
-                    }
-                });
+                goToPage(chapters.get(chapter_index).getFirstPage());
             }
         });
     }
@@ -73,7 +70,6 @@ public class PageActivity extends Activity
                 float offsetX = event1.getX() - event2.getX();
                 float offsetY = event1.getY() - event2.getY();
 
-                Log.d("onFling", "fling detected! " + offsetX + ";" + offsetY);
                 if (Math.abs(offsetX) > Math.abs(offsetY) * 2)
                 {
                     if (offsetX < 0)
@@ -87,48 +83,54 @@ public class PageActivity extends Activity
         });
     }
 
-    private void loadChapter(final Chapter chapter, final Runnable after)
+    private void loadChapter(final int new_index, final Runnable after)
     {
-        chapter.load(new Runnable()
+        if (new_index >= 0 && new_index < chapters.size())
         {
-            @Override
-            public void run()
+            Chapter to_load = chapters.get(new_index);
+            to_load.load(new Runnable()
             {
-                if (PageActivity.chapter != null && PageActivity.chapter != chapter)
-                    PageActivity.chapter.unload();
+                @Override
+                public void run()
+                {
+                    if (chapter_index >= 0 && chapter_index < chapters.size() && chapter_index != new_index)
+                        chapters.get(chapter_index).unload();
 
-                PageActivity.chapter = chapter;
-                after.run();
-            }
-        }, new Runnable()
-        {
-            @Override
-            public void run()
+                    chapter_index = new_index;
+                    after.run();
+                }
+            }, new Runnable()
             {
-                AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
-                builder.setTitle(R.string.error)
-                        .setMessage(R.string.no_internet_connection)
-                        .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
+                @Override
+                public void run()
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
+                    builder.setTitle(R.string.error)
+                            .setMessage(R.string.no_internet_connection)
+                            .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
                             {
-                                loadChapter(chapter, after);
-                            }
-                        })
-                        .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
-                        {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    loadChapter(new_index, after);
+                                }
+                            })
+                            .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
                             {
-                                finish();
-                            }
-                        });
 
-                builder.create().show();
-            }
-        });
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    finish();
+                                }
+                            });
+
+                    builder.create().show();
+                }
+            });
+        }
+        else
+            finish();
     }
 
     private void loadPage(final Page page, final Runnable success)
@@ -215,43 +217,31 @@ public class PageActivity extends Activity
             goToPage(current_page.next());
         else
         {
-            final Chapter next_chapter =  chapter.getNextChapter();
-            if (next_chapter != null)
+            loadChapter(chapter_index - 1, new Runnable()
             {
-                loadChapter(next_chapter, new Runnable()
+                @Override
+                public void run()
                 {
-                    @Override
-                    public void run()
-                    {
-                        goToPage(next_chapter.getFirstPage());
-                    }
-                });
-            }
-            else
-                finish();
+                    goToPage(chapters.get(chapter_index).getFirstPage());
+                }
+            });
         }
     }
 
     private void goToPreviousPage()
     {
-        if (current_page.hasPrevious())
-            goToPage(current_page.previous());
+        if (current_page.hasNext())
+            goToPage(current_page.next());
         else
         {
-            final Chapter previous_chapter =  chapter.getPreviousChapter();
-            if (previous_chapter != null)
+            loadChapter(chapter_index + 1, new Runnable()
             {
-                loadChapter(previous_chapter, new Runnable()
+                @Override
+                public void run()
                 {
-                    @Override
-                    public void run()
-                    {
-                        goToPage(previous_chapter.getLastPage());
-                    }
-                });
-            }
-            else
-                finish();
+                    goToPage(chapters.get(chapter_index).getLastPage());
+                }
+            });
         }
     }
 }

@@ -96,7 +96,8 @@ public abstract class Manga implements Loadable
 
     /**
      * Get all chapters of the manga. Only important data might be loaded at this time, so
-     * some data might be missing.
+     * some data might be missing. The chapters must be ordered by release: the most recent one
+     * has to be the first in the list.
      * @return a list of all chapters. If an error occurred, null is returned. If the current manga doesn't have any chapter
      * an empty list is returned.
      */

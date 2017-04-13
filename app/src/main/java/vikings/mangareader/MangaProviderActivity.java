@@ -38,7 +38,6 @@ public class MangaProviderActivity extends AppCompatActivity
         main_toolbar.inflateMenu(R.menu.main_toolbar_menu);
         setSupportActionBar(main_toolbar);
 
-
         init();
     }
 
@@ -81,16 +80,16 @@ public class MangaProviderActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case R.id.action_bookmark:
-                Toast debug = Toast.makeText(getApplicationContext(),"pute pute pute bookmark",Toast.LENGTH_LONG);
+                Toast debug = Toast.makeText(getApplicationContext(),"bookmark",Toast.LENGTH_LONG);
                 debug.show();
                 return true;
 
             case R.id.action_account:
-                debug = Toast.makeText(getApplicationContext(),"pdpdpd log in",Toast.LENGTH_LONG);
+                debug = Toast.makeText(getApplicationContext(),"log in",Toast.LENGTH_LONG);
                 debug.show();
                 return true;
             case R.id.action_settings:
-                debug = Toast.makeText(getApplicationContext(),"suce suce suce settings",Toast.LENGTH_LONG);
+                debug = Toast.makeText(getApplicationContext(),"settings",Toast.LENGTH_LONG);
                 debug.show();
 
             default:

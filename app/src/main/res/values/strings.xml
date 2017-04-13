@@ -9,6 +9,7 @@
     <string name="genres">Genres</string>
     <string name="status">Status</string>
     <string name="rating">Rating</string>
+    <string name="unknown">Unknown</string>
 
     <!--  Errors strings  -->
     <string name="error">Error!</string>
