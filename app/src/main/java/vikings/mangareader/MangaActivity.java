@@ -1,9 +1,14 @@
 package vikings.mangareader;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,128 +20,123 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import vikings.mangareader.MangaProvider.Chapter;
-import vikings.mangareader.MangaProvider.Manga;
+import vikings.mangareader.Manga.ChapterLoader;
+import vikings.mangareader.Manga.MangaLoader;
+import vikings.mangareader.Manga.Manga;
 
-public class MangaActivity extends Activity
+public class MangaActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Manga>
 {
-    static Manga manga;
+    public static MangaLoader manga;
+
+    public static void start(Context context, MangaLoader loader)
+    {
+        if (loader == null)
+            return;
+
+        MangaActivity.manga = loader;
+        context.startActivity(new Intent(context, MangaActivity.class));
+    }
 
     public void onCreate(Bundle savedInstanceBundle)
     {
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.manga_layout);
 
-        loadManga();
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
-    public void onDestroy()
+    public Loader<Manga> onCreateLoader(int id, Bundle args)
     {
-        if (manga != null)
-            manga.unload();
-
-        super.onDestroy();
+        manga.forceLoad();
+        return (manga);
     }
 
-    private void loadManga()
+    public void onLoadFinished(final Loader<Manga> loader, final Manga to_display)
     {
-        if (manga == null)
-            finish();
-
-        manga.load(new Runnable()
+        if (to_display != null)
         {
-            @Override
-            public void run()
+            setTextIn((TextView)findViewById(R.id.manga_name), to_display.name());
+            setTextIn((TextView)findViewById(R.id.manga_authors), to_display.authors());
+            setTextIn((TextView)findViewById(R.id.manga_summary), to_display.summary());
+            setTextIn((TextView)findViewById(R.id.manga_rating), to_display.rating() * 5 + " / 5 stars");
+            setTextIn((TextView)findViewById(R.id.manga_status), to_display.status() );
+            setTextIn((TextView)findViewById(R.id.manga_genres), to_display.genres().toString());
+
+            ((ImageView)findViewById(R.id.manga_cover)).setImageDrawable(to_display.cover());
+
+            ListView chapters_list = (ListView)findViewById(R.id.manga_chapters);
+            loadChaptersList(chapters_list, to_display);
+
+            if (chapters_list != null)
             {
-                init();
+                chapters_list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
+                        PageActivity.start(MangaActivity.this, to_display.chapters, position);
+                    }
+                });
             }
-        }, new Runnable()
+
+            Switch switcher = (Switch)findViewById(R.id.chapters_summary_switch);
+            switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+            {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+                {
+                    ViewSwitcher summary_chapters = (ViewSwitcher)findViewById(R.id.chapters_summary);
+                    if (!isChecked)
+                        summary_chapters.showPrevious();
+                    else
+                        summary_chapters.showNext();
+
+                }
+            });
+        }
+        else
         {
-            @Override
-            public void run()
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MangaActivity.this);
-                builder.setTitle(R.string.error)
-                        .setMessage(R.string.no_internet_connection)
-                        .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
+            AlertDialog.Builder builder = new AlertDialog.Builder(MangaActivity.this);
+            builder.setTitle(R.string.error)
+                    .setMessage(R.string.no_internet_connection)
+                    .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
                         {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                loadManga();
-                            }
-                        })
-                        .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
+                            loader.forceLoad();
+                        }
+                    })
+                    .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
+                    {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
                         {
+                            finish();
+                        }
+                    });
+            builder.create().show();
+        }
+    }
 
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                finish();
-                            }
-                        });
+    public void onLoaderReset(Loader<Manga> loader)
+    {
 
-                builder.create().show();
-            }
-        });
     }
 
     private void setTextIn(TextView view, String text)
     {
-            view.setText(text != null ? text : getResources().getString(R.string.unknown));
+        view.setText(text != null ? text : getResources().getString(R.string.unknown));
     }
 
-    private void init()
+
+    private void loadChaptersList(ListView chapters_list, Manga to_display)
     {
-        setTextIn((TextView)findViewById(R.id.manga_name), manga.name());
-        setTextIn((TextView)findViewById(R.id.manga_authors), manga.authors());
-        setTextIn((TextView)findViewById(R.id.manga_summary), manga.summary());
-        setTextIn((TextView)findViewById(R.id.manga_rating), manga.rating() * 5 + " / 5 stars");
-        setTextIn((TextView)findViewById(R.id.manga_status), manga.status() );
-        setTextIn((TextView)findViewById(R.id.manga_genres), manga.genres().toString());
-
-        ((ImageView)findViewById(R.id.manga_cover)).setImageDrawable(manga.cover());
-
-        ListView chapters_list = (ListView)findViewById(R.id.manga_chapters);
-        loadChaptersList(chapters_list);
-
-        if (chapters_list != null)
-        {
-            chapters_list.setOnItemClickListener(new AdapterView.OnItemClickListener()
-            {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                {
-                    PageActivity.start(MangaActivity.this, manga.chapters(), position);
-                }
-            });
-        }
-
-        Switch switcher = (Switch)findViewById(R.id.chapters_summary_switch);
-        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                ViewSwitcher summary_chapters = (ViewSwitcher)findViewById(R.id.chapters_summary);
-                if (!isChecked)
-                    summary_chapters.showPrevious();
-                else
-                    summary_chapters.showNext();
-
-            }
-        });
-    }
-
-    private void loadChaptersList(ListView chapters_list)
-    {
-        List<Chapter> chapters = manga.chapters();
-
         ArrayList<String> chapters_name = new ArrayList<>();
-        for (Chapter chapter : chapters)
+        for (ChapterLoader chapter : to_display.chapters)
         {
             String name = chapter.name();
             if (name != null)

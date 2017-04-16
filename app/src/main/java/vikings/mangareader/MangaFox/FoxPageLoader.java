@@ -1,67 +1,52 @@
-package vikings.mangareader.MangaFoxProvider;
+package vikings.mangareader.MangaFox;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import vikings.mangareader.MangaProvider.Page;
+import vikings.mangareader.Manga.Page;
+import vikings.mangareader.Manga.PageLoader;
 import vikings.mangareader.Utils;
 
-public class FoxPage extends Page
+class FoxPageLoader extends PageLoader
 {
     private String url;
 
-    FoxPage(String url)
+    FoxPageLoader(Context context, String url)
     {
+        super(context);
         this.url = url;
     }
 
-    public void load(@Nullable final Runnable success, @Nullable final Runnable error)
+    public Page loadInBackground()
     {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Handler handler = new Handler(Looper.getMainLooper());
-                if (parsePage(Utils.InputStreamToString(Utils.getInputStreamFromURL(url))))
-                    handler.post(success);
-                else
-                    handler.post(error);
-
-            }
-        }).start();
+        return (parsePage(Utils.InputStreamToString(Utils.getInputStreamFromURL(url))));
     }
 
-    public void unload()
+    private Page parsePage(String html)
     {
-    }
+        if (html == null || "".equals(html))
+            return (null);
 
-    private boolean parsePage(String html)
-    {
-        if (html == null)
-            return (false);
-
+        Page page = new Page();
         try
         {
-            picture = Drawable.createFromStream(
+            page.picture = Drawable.createFromStream(
                     Utils.getInputStreamFromURL(Utils.parseUnique(html, "<div class=\"read_img\">", "<img src=\"", "\"")),
                     "page");
         }
         catch (OutOfMemoryError e)
         {
-            picture = null;
+            page.picture = null;
         }
 
-        parseNextButton(html);
-        parsePreviousButton(html);
+        parsePreviousButton(html, page);
+        parseNextButton(html, page);
 
-        return (true);
+        return (page);
     }
 
-    private void parsePreviousButton(String html)
+    private void parsePreviousButton(String html, Page page)
     {
         int end = html.indexOf("class=\"btn prev_page\"");
         if (end != -1)
@@ -70,8 +55,10 @@ public class FoxPage extends Page
             String previous_page_end_url = Utils.parseUnique(html.substring(start, end), "<a href=\"", "\"", "\"");
             if (previous_page_end_url != null)
             {
-                if (!previous_page_end_url.contains("javascript") && !previous_page_end_url.contains("void"))
-                    previous = new FoxPage(url.substring(0, url.lastIndexOf("/") + 1) + previous_page_end_url);
+                if (!previous_page_end_url.contains("javascript") && !previous_page_end_url.contains("void") &&
+                        !previous_page_end_url.contains("http"))
+                    page.previous = new FoxPageLoader(getContext(),
+                            url.substring(0, url.lastIndexOf("/") + 1) + previous_page_end_url);
                 else
                     Log.d("parsePreviousButton", "no previous page (javascript or void found in string)");
             }
@@ -82,7 +69,7 @@ public class FoxPage extends Page
             Log.d("parsePreviousButton", "previous button not found");
     }
 
-    private void parseNextButton(String html)
+    private void parseNextButton(String html, Page page)
     {
         int end = html.indexOf("class=\"btn next_page\"");
         if (end != -1)
@@ -93,9 +80,8 @@ public class FoxPage extends Page
             {
                 if (!next_page_end_url.contains("javascript") && !next_page_end_url.contains("void") &&
                         !next_page_end_url.contains("http"))
-                {
-                    next = new FoxPage(url.substring(0, url.lastIndexOf("/") + 1) + next_page_end_url);
-                }
+                    page.next = new FoxPageLoader(getContext(),
+                            url.substring(0, url.lastIndexOf("/") + 1) + next_page_end_url);
                 else
                     Log.d("parseNextButton", "no next page (javascript or void found in string)");
             }

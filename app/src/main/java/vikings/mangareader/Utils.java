@@ -1,4 +1,4 @@
-package vikings.mangareader.MangaFoxProvider;
+package vikings.mangareader;
 
 import android.util.Log;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Utils
 {
-    static InputStream getInputStreamFromURL(String url)
+    public static InputStream getInputStreamFromURL(String url)
     {
         if (url == null)
         {
@@ -36,7 +36,7 @@ public class Utils
         }
     }
 
-    static String InputStreamToString(InputStream in)
+    public static String InputStreamToString(InputStream in)
     {
         if (in == null)
             return null;
@@ -56,7 +56,7 @@ public class Utils
         }
     }
 
-    static String fromHtmlString(String str)
+    public static String fromHtmlString(String str)
     {
         if (str == null)
             return (null);
@@ -66,7 +66,7 @@ public class Utils
                 .replaceAll("&quot;", "\""));
     }
 
-    static String parseUnique(String to_search, String distinctive_token, String start, String end)
+    public static String parseUnique(String to_search, String distinctive_token, String start, String end)
     {
         int start_info = to_search.indexOf(distinctive_token);
         if (start_info != -1)
@@ -83,7 +83,7 @@ public class Utils
         return (null);
     }
 
-    static List<String> parseMultiple(String to_search, String distinctive_token, String start, String end)
+    public static List<String> parseMultiple(String to_search, String distinctive_token, String start, String end)
     {
         ArrayList<String> results = new ArrayList<>();
 

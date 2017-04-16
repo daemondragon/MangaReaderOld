@@ -1,16 +1,13 @@
 package vikings.mangareader;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,12 +19,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import vikings.mangareader.MangaProvider.Manga;
-import vikings.mangareader.MangaProvider.MangaProvider;
+import vikings.mangareader.Manga.MangaLoader;
+import vikings.mangareader.MangaFoxProvider.MangaFoxNewsLoader;
 
 public class MangaProviderActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<List<MangaLoader>>
 {
-    static MangaProvider provider;
+    List<MangaLoader> mangas = null;
 
     public void onCreate(Bundle savedInstanceBundle)
     {
@@ -37,6 +35,8 @@ public class MangaProviderActivity extends AppCompatActivity
         Toolbar main_toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         main_toolbar.inflateMenu(R.menu.main_toolbar_menu);
         setSupportActionBar(main_toolbar);
+
+        getSupportLoaderManager().initLoader(0, null, this);
 
         init();
     }
@@ -51,20 +51,26 @@ public class MangaProviderActivity extends AppCompatActivity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    MangaActivity.manga = provider.mangas().get(position);;
-                    startActivity(new Intent(MangaProviderActivity.this, MangaActivity.class));
-
+                    MangaActivity.start(MangaProviderActivity.this, mangas.get(position));
                 }
             });
-            loadMangasList(list);
         }
     }
 
-    private void loadMangasList(@NonNull ListView manga_list_view)
+    public Loader<List<MangaLoader>> onCreateLoader(int id, Bundle args)
     {
-        List<Manga> mangas = provider.mangas();
+        Loader<List<MangaLoader>> loader = new MangaFoxNewsLoader(this);
+        loader.forceLoad();
+        return (loader);
+    }
+
+    public void onLoadFinished(Loader<List<MangaLoader>> loader, List<MangaLoader> to_display)
+    {
+        mangas = to_display;
+
+        ListView manga_list_view = (ListView) findViewById(R.id.manga_list);
         ArrayList<String> mangas_name = new ArrayList<>();
-        for (Manga manga : mangas)
+        for (MangaLoader manga : to_display)
         {
             String name = manga.name();
             if (name != null)
@@ -74,6 +80,11 @@ public class MangaProviderActivity extends AppCompatActivity
         manga_list_view.setAdapter(new ArrayAdapter<>(MangaProviderActivity.this,
                 R.layout.support_simple_spinner_dropdown_item,
                 mangas_name));
+    }
+
+    public void onLoaderReset(Loader<List<MangaLoader>> loader)
+    {
+
     }
 
     @Override // handler for the overflow menu of the app bar
@@ -110,10 +121,13 @@ public class MangaProviderActivity extends AppCompatActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                provider.search(searchView.getQuery().toString(), null, new Runnable() {
+                //Totalement normal, je suis en train de casser des trucs.
+                // (Beaucoup de truc....)
+                /*provider.search(searchView.getQuery().toString(), null, new Runnable() {
                     @Override
                     public void run() {
-                        loadMangasList((ListView) findViewById(R.id.manga_list));
+
+                        //loadMangasList((ListView) findViewById(R.id.manga_list));
                     }
                 }, new Runnable() {
                     @Override
@@ -131,7 +145,7 @@ public class MangaProviderActivity extends AppCompatActivity
                                 });
                         builder.create().show();
                     }
-                });
+                });*/
                 return true;
             }
 

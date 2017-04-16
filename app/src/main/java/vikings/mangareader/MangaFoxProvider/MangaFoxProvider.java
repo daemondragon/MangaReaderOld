@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import vikings.mangareader.MangaProvider.MangaProvider;
+import vikings.mangareader.Utils;
 
 public class MangaFoxProvider extends MangaProvider
 {

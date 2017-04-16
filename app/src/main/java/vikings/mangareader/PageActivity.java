@@ -1,40 +1,45 @@
 package vikings.mangareader;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import java.util.List;
 
-import vikings.mangareader.MangaProvider.Chapter;
-import vikings.mangareader.MangaProvider.Page;
+import vikings.mangareader.Manga.ChapterLoader;
+import vikings.mangareader.Manga.PageLoader;
+import vikings.mangareader.Manga.Chapter;
+import vikings.mangareader.Manga.Page;
 
-public class PageActivity extends Activity
+public class PageActivity extends AppCompatActivity
 {
-    private static List<Chapter> chapters;
+    private static List<ChapterLoader> chapters;
     private static int chapter_index = -1;
 
-    private Page current_page;
+    private Page current_page = null;
     private GestureDetector detector;
 
-    public static void start(Context context, List<Chapter> chapters, int chapter_index)
+    private static final int chapter_manager = 0;
+    private static final int page_manager = 1;
+
+    public static void start(Context context, List<ChapterLoader> chapters, int chapter_index)
     {
         if (chapters == null || chapter_index < 0 || chapter_index >= chapters.size())
             return;
 
         PageActivity.chapters = chapters;
         PageActivity.chapter_index = chapter_index;
+
         context.startActivity(new Intent(context, PageActivity.class));
     }
 
@@ -43,16 +48,10 @@ public class PageActivity extends Activity
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.page_layout);
 
-        init();
+        getSupportLoaderManager().initLoader(chapter_manager, getIntent().getExtras(),
+                new ChapterLoaderManager(chapters.get(chapter_index)));
 
-        loadChapter(chapter_index, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                goToPage(chapters.get(chapter_index).getFirstPage());
-            }
-        });
+        init();
     }
 
     public boolean dispatchTouchEvent(MotionEvent e)
@@ -73,9 +72,42 @@ public class PageActivity extends Activity
                 if (Math.abs(offsetX) > Math.abs(offsetY) * 2)
                 {
                     if (offsetX < 0)
-                        goToPreviousPage();
+                    {//previous
+                        if (current_page != null)
+                        {
+                            if (current_page.hasPrevious())
+                                getSupportLoaderManager().restartLoader(page_manager, null, new PageLoaderManager(current_page.previous));
+                            else
+                            {
+                                if (chapter_index + 1 < chapters.size())
+                                    getSupportLoaderManager().restartLoader(chapter_manager, null,
+                                            new ChapterLoaderManager(chapters.get(++chapter_index)));
+                                else
+                                    finish();
+                            }
+                        }
+                        else
+                            finish();
+
+                    }
                     else
-                        goToNextPage();
+                    {
+                        if (current_page != null)
+                        {
+                            if (current_page.hasNext())
+                                getSupportLoaderManager().restartLoader(page_manager, null, new PageLoaderManager(current_page.next));
+                            else
+                            {
+                                if (chapter_index != 0)
+                                    getSupportLoaderManager().restartLoader(chapter_manager, null,
+                                            new ChapterLoaderManager(chapters.get(--chapter_index)));
+                                else
+                                    finish();
+                            }
+                        }
+                        else
+                            finish();
+                    }
                 }
                 return true;
             }
@@ -83,165 +115,112 @@ public class PageActivity extends Activity
         });
     }
 
-    private void loadChapter(final int new_index, final Runnable after)
+    private class ChapterLoaderManager implements LoaderManager.LoaderCallbacks<Chapter>
     {
-        if (new_index >= 0 && new_index < chapters.size())
+        ChapterLoader to_load = null;
+
+        ChapterLoaderManager(ChapterLoader to_load)
         {
-            Chapter to_load = chapters.get(new_index);
-            to_load.load(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    if (chapter_index >= 0 && chapter_index < chapters.size() && chapter_index != new_index)
-                        chapters.get(chapter_index).unload();
-
-                    chapter_index = new_index;
-                    after.run();
-                }
-            }, new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
-                    builder.setTitle(R.string.error)
-                            .setMessage(R.string.no_internet_connection)
-                            .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    loadChapter(new_index, after);
-                                }
-                            })
-                            .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
-                            {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    finish();
-                                }
-                            });
-
-                    builder.create().show();
-                }
-            });
+            this.to_load = to_load;
         }
-        else
-            finish();
-    }
 
-    private void loadPage(final Page page, final Runnable success)
-    {
-        if (page == null)
-            return;
-
-        page.load(success, new Runnable()
+        public Loader<Chapter> onCreateLoader(int id, Bundle args)
         {
-            @Override
-            public void run()
+            to_load.forceLoad();
+            return (to_load);
+        }
+
+        public void onLoadFinished(final Loader<Chapter> loader, Chapter to_display)
+        {
+            if (to_display != null)
+                getSupportLoaderManager().restartLoader(page_manager, null, new PageLoaderManager(to_display.first_page));
+            else
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
                 builder.setTitle(R.string.error)
                         .setMessage(R.string.no_internet_connection)
-                        .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
-                        {
+                        .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                loadPage(page, success);
+                            public void onClick(DialogInterface dialog, int which) {
+                                loader.forceLoad();
                             }
                         })
-                        .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
-                        {
+                        .setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
+                            public void onClick(DialogInterface dialog, int which) {
                                 finish();
                             }
                         });
                 builder.create().show();
             }
-        });
-    }
-
-    private void setPicture(Drawable picture)
-    {
-        if (picture != null)
-        {
-            ((ScrollView) findViewById(R.id.manga_page_scroll)).fullScroll(ScrollView.FOCUS_UP);
-            ((ImageView) findViewById(R.id.manga_page)).setImageDrawable(picture);
         }
-        else
+
+        public void onLoaderReset(Loader<Chapter> loader)
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
-            builder.setTitle(R.string.error)
-                    .setMessage(R.string.picture_loading_error)
-                    .setPositiveButton(R.string.ok, null);
-            builder.create().show();
+
         }
     }
 
-    private void goToPage(final Page page)
+    private class PageLoaderManager implements LoaderManager.LoaderCallbacks<Page>
     {
-        if (page != null)
+        PageLoader to_load = null;
+
+        PageLoaderManager(PageLoader to_load)
         {
-            final TextView loading = (TextView)findViewById(R.id.loading_tag);
-            if (loading != null)
-                loading.setVisibility(View.VISIBLE);
-
-            loadPage(page, new Runnable() {
-                @Override
-                public void run()
-                {
-                    current_page = page;
-                    setPicture(page.getPicture());
-
-                    if (loading != null)
-                        loading.setVisibility(View.INVISIBLE);
-                }
-            });
+            this.to_load = to_load;
         }
-        else
-        {
-            Log.d("goToPage", "page is null, finishing activity");
-            finish();
-        }
-    }
 
-    private void goToNextPage()
-    {
-        if (current_page.hasNext())
-            goToPage(current_page.next());
-        else
+        public Loader<Page> onCreateLoader(int id, Bundle args)
         {
-            loadChapter(chapter_index - 1, new Runnable()
+            to_load.forceLoad();
+            findViewById(R.id.loading_tag).setVisibility(View.VISIBLE);
+            return (to_load);
+        }
+
+        public void onLoadFinished(final Loader<Page> loader, Page to_display)
+        {
+            if (to_display != null)
             {
-                @Override
-                public void run()
+                current_page = to_display;
+                if (to_display.getPicture() != null)
                 {
-                    goToPage(chapters.get(chapter_index).getFirstPage());
+                    ((ScrollView) findViewById(R.id.manga_page_scroll)).fullScroll(ScrollView.FOCUS_UP);
+                    ((ImageView) findViewById(R.id.manga_page)).setImageDrawable(to_display.getPicture());
+                    findViewById(R.id.loading_tag).setVisibility(View.INVISIBLE);
                 }
-            });
-        }
-    }
-
-    private void goToPreviousPage()
-    {
-        if (current_page.hasNext())
-            goToPage(current_page.next());
-        else
-        {
-            loadChapter(chapter_index + 1, new Runnable()
+                else
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
+                    builder.setTitle(R.string.error)
+                            .setMessage(R.string.picture_loading_error)
+                            .setPositiveButton(R.string.ok, null);
+                    builder.create().show();
+                }
+            }
+            else
             {
-                @Override
-                public void run()
-                {
-                    goToPage(chapters.get(chapter_index).getLastPage());
-                }
-            });
+                AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
+                builder.setTitle(R.string.error)
+                        .setMessage(R.string.no_internet_connection)
+                        .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                loader.forceLoad();
+                            }
+                        })
+                        .setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                builder.create().show();
+            }
+        }
+
+        public void onLoaderReset(Loader<Page> loader)
+        {
+
         }
     }
 }

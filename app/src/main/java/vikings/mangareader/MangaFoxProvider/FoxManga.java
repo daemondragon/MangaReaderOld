@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import vikings.mangareader.MangaProvider.Manga;
+import vikings.mangareader.Utils;
 
 class FoxManga extends Manga
 {
