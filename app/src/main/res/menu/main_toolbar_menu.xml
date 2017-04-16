@@ -10,21 +10,10 @@
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView" />
 
-    <item
-    android:id="@+id/action_bookmark"
-    android:icon="@mipmap/ic_bookmark"
-    android:title="@string/bookmark"
-    app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/action_account"
-        android:icon="@mipmap/ic_account"
-        android:title="@string/log_in"
-        app:showAsAction="ifRoom"/>
-
 
     <!-- Settings, should always be in the overflow -->
-    <item android:id="@+id/action_settings"
-        android:title="@string/settings"
+    <item android:id="@+id/action_advanced_search"
+        android:title="@string/advanced"
         app:showAsAction="never"/>
 
 </menu>

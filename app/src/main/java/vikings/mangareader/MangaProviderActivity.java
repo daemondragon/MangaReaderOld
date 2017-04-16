@@ -1,10 +1,10 @@
 package vikings.mangareader;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -20,11 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import vikings.mangareader.Manga.MangaLoader;
-import vikings.mangareader.MangaFoxProvider.MangaFoxNewsLoader;
+import vikings.mangareader.MangaFox.MangaFoxNewsLoader;
+import vikings.mangareader.MangaFox.MangaFoxSearchLoader;
 
 public class MangaProviderActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<List<MangaLoader>>
 {
+    private static final String SEARCHING = "SEARCHING";
+    private static final String SEARCHING_MANGA_NAME = "SEARCHING_MANGA_NAME";
     List<MangaLoader> mangas = null;
 
     public void onCreate(Bundle savedInstanceBundle)
@@ -36,7 +39,14 @@ public class MangaProviderActivity extends AppCompatActivity
         main_toolbar.inflateMenu(R.menu.main_toolbar_menu);
         setSupportActionBar(main_toolbar);
 
+
         getSupportLoaderManager().initLoader(0, null, this);
+
+
+        String[] nav_list = getResources().getStringArray(R.array.nav_drawer_list);
+        DrawerLayout nav_drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ListView drawer_view = (ListView) findViewById(R.id.drawer_view);
+        drawer_view.setAdapter(new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,nav_list));
 
         init();
     }
@@ -59,7 +69,13 @@ public class MangaProviderActivity extends AppCompatActivity
 
     public Loader<List<MangaLoader>> onCreateLoader(int id, Bundle args)
     {
-        Loader<List<MangaLoader>> loader = new MangaFoxNewsLoader(this);
+        Loader<List<MangaLoader>> loader;
+
+        if (args != null && args.getBoolean(SEARCHING, false))
+            loader = new MangaFoxSearchLoader(this, args.getString(SEARCHING_MANGA_NAME));
+        else
+            loader = new MangaFoxNewsLoader(this);
+
         loader.forceLoad();
         return (loader);
     }
@@ -90,18 +106,11 @@ public class MangaProviderActivity extends AppCompatActivity
     @Override // handler for the overflow menu of the app bar
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
-            case R.id.action_bookmark:
-                Toast debug = Toast.makeText(getApplicationContext(),"bookmark",Toast.LENGTH_LONG);
+            case R.id.action_advanced_search:
+                Toast debug = Toast.makeText(getApplicationContext(),"advanced search",Toast.LENGTH_LONG);
                 debug.show();
                 return true;
 
-            case R.id.action_account:
-                debug = Toast.makeText(getApplicationContext(),"log in",Toast.LENGTH_LONG);
-                debug.show();
-                return true;
-            case R.id.action_settings:
-                debug = Toast.makeText(getApplicationContext(),"settings",Toast.LENGTH_LONG);
-                debug.show();
 
             default:
                 // If we got here, the user's action was not recognized.
@@ -115,37 +124,19 @@ public class MangaProviderActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         super.onCreateOptionsMenu(menu);
+
+
+
         getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //Totalement normal, je suis en train de casser des trucs.
-                // (Beaucoup de truc....)
-                /*provider.search(searchView.getQuery().toString(), null, new Runnable() {
-                    @Override
-                    public void run() {
-
-                        //loadMangasList((ListView) findViewById(R.id.manga_list));
-                    }
-                }, new Runnable() {
-                    @Override
-                    public void run() {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MangaProviderActivity.this);
-                        builder.setTitle(R.string.error)
-                                .setMessage(R.string.no_internet_connection)
-                                .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-
-                                    }
-                                });
-                        builder.create().show();
-                    }
-                });*/
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(SEARCHING, true);
+                bundle.putString(SEARCHING_MANGA_NAME, query);
+                getSupportLoaderManager().restartLoader(0, bundle, MangaProviderActivity.this);
                 return true;
             }
 
@@ -156,4 +147,5 @@ public class MangaProviderActivity extends AppCompatActivity
         });
         return true;
     }
+    //-----------------------------------------------------------------------------------------------------
 }
