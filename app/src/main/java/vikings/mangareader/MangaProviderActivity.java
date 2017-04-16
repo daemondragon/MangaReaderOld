@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -33,11 +34,16 @@ public class MangaProviderActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.manga_provider_layout);
-
+ //julien -------------------------------------------------
         Toolbar main_toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         main_toolbar.inflateMenu(R.menu.main_toolbar_menu);
         setSupportActionBar(main_toolbar);
 
+        String[] nav_list = getResources().getStringArray(R.array.nav_drawer_list);
+        DrawerLayout nav_drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ListView drawer_view = (ListView) findViewById(R.id.drawer_view);
+        drawer_view.setAdapter(new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,nav_list));
+//--------------------------------------------------------------
         init();
     }
 
@@ -76,21 +82,15 @@ public class MangaProviderActivity extends AppCompatActivity
                 mangas_name));
     }
 
+    //julien------------------------------------------------------------------
     @Override // handler for the overflow menu of the app bar
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
-            case R.id.action_bookmark:
-                Toast debug = Toast.makeText(getApplicationContext(),"bookmark",Toast.LENGTH_LONG);
+            case R.id.action_advanced_search:
+                Toast debug = Toast.makeText(getApplicationContext(),"advanced search",Toast.LENGTH_LONG);
                 debug.show();
                 return true;
 
-            case R.id.action_account:
-                debug = Toast.makeText(getApplicationContext(),"log in",Toast.LENGTH_LONG);
-                debug.show();
-                return true;
-            case R.id.action_settings:
-                debug = Toast.makeText(getApplicationContext(),"settings",Toast.LENGTH_LONG);
-                debug.show();
 
             default:
                 // If we got here, the user's action was not recognized.
@@ -104,6 +104,9 @@ public class MangaProviderActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         super.onCreateOptionsMenu(menu);
+
+
+
         getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -142,4 +145,5 @@ public class MangaProviderActivity extends AppCompatActivity
         });
         return true;
     }
+    //-----------------------------------------------------------------------------------------------------
 }
