@@ -138,7 +138,7 @@ public class PageActivity extends AppCompatActivity
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
                 builder.setTitle(R.string.error)
-                        .setMessage(R.string.no_internet_connection)
+                        .setMessage(R.string.chapter_provider_loading_error)
                         .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -182,11 +182,11 @@ public class PageActivity extends AppCompatActivity
             if (to_display != null)
             {
                 current_page = to_display;
+                findViewById(R.id.loading_tag).setVisibility(View.INVISIBLE);
                 if (to_display.getPicture() != null)
                 {
                     ((ScrollView) findViewById(R.id.manga_page_scroll)).fullScroll(ScrollView.FOCUS_UP);
                     ((ImageView) findViewById(R.id.manga_page)).setImageDrawable(to_display.getPicture());
-                    findViewById(R.id.loading_tag).setVisibility(View.INVISIBLE);
                 }
                 else
                 {
@@ -201,7 +201,7 @@ public class PageActivity extends AppCompatActivity
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(PageActivity.this);
                 builder.setTitle(R.string.error)
-                        .setMessage(R.string.no_internet_connection)
+                        .setMessage(R.string.page_loading_error)
                         .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,20 +21,16 @@ import android.widget.ViewSwitcher;
 import java.util.ArrayList;
 
 import vikings.mangareader.Manga.ChapterLoader;
-import vikings.mangareader.Manga.MangaLoader;
 import vikings.mangareader.Manga.Manga;
 
 public class MangaActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Manga>
 {
-    public static MangaLoader manga;
-
-    public static void start(Context context, MangaLoader loader)
+    public static void startFrom(Context context)
     {
-        if (loader == null)
+        if (LoaderSingleton.manga == null)
             return;
 
-        MangaActivity.manga = loader;
         context.startActivity(new Intent(context, MangaActivity.class));
     }
 
@@ -47,10 +42,16 @@ public class MangaActivity extends AppCompatActivity
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
+    public void onDestroy()
+    {
+        super.onDestroy();
+        LoaderSingleton.manga = null;
+    }
+
     public Loader<Manga> onCreateLoader(int id, Bundle args)
     {
-        manga.forceLoad();
-        return (manga);
+        LoaderSingleton.manga.forceLoad();
+        return (LoaderSingleton.manga);
     }
 
     public void onLoadFinished(final Loader<Manga> loader, final Manga to_display)
@@ -100,7 +101,7 @@ public class MangaActivity extends AppCompatActivity
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(MangaActivity.this);
             builder.setTitle(R.string.error)
-                    .setMessage(R.string.no_internet_connection)
+                    .setMessage(R.string.manga_loading_error)
                     .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
                     {
                         @Override

@@ -1,5 +1,7 @@
 package vikings.mangareader;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -61,7 +63,8 @@ public class MangaProviderActivity extends AppCompatActivity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    MangaActivity.start(MangaProviderActivity.this, mangas.get(position));
+                    LoaderSingleton.manga = mangas.get(position);
+                    MangaActivity.startFrom(MangaProviderActivity.this);
                 }
             });
         }
@@ -80,22 +83,47 @@ public class MangaProviderActivity extends AppCompatActivity
         return (loader);
     }
 
-    public void onLoadFinished(Loader<List<MangaLoader>> loader, List<MangaLoader> to_display)
+    public void onLoadFinished(final Loader<List<MangaLoader>> loader, List<MangaLoader> to_display)
     {
-        mangas = to_display;
+        if (to_display != null) {
+            mangas = to_display;
 
-        ListView manga_list_view = (ListView) findViewById(R.id.manga_list);
-        ArrayList<String> mangas_name = new ArrayList<>();
-        for (MangaLoader manga : to_display)
-        {
-            String name = manga.name();
-            if (name != null)
-                mangas_name.add(name);
+            ListView manga_list_view = (ListView) findViewById(R.id.manga_list);
+            ArrayList<String> mangas_name = new ArrayList<>();
+            for (MangaLoader manga : to_display) {
+                String name = manga.name();
+                if (name != null)
+                    mangas_name.add(name);
+            }
+
+            manga_list_view.setAdapter(new ArrayAdapter<>(MangaProviderActivity.this,
+                    R.layout.support_simple_spinner_dropdown_item,
+                    mangas_name));
         }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MangaProviderActivity.this);
+            builder.setTitle(R.string.error)
+                    .setMessage(R.string.manga_provider_loading_error)
+                    .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            loader.forceLoad();
+                        }
+                    })
+                    .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
+                    {
 
-        manga_list_view.setAdapter(new ArrayAdapter<>(MangaProviderActivity.this,
-                R.layout.support_simple_spinner_dropdown_item,
-                mangas_name));
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            finish();
+                        }
+                    });
+            builder.create().show();
+        }
     }
 
     public void onLoaderReset(Loader<List<MangaLoader>> loader)

@@ -13,9 +13,12 @@
 
     <!--  Errors strings  -->
     <string name="error">Error!</string>
-    <string name="no_internet_connection">Can\'t connect to the website</string>
+    <string name="manga_provider_loading_error">Can\'t load mangas list</string>
+    <string name="manga_loading_error">Can\'t load the manga</string>
+    <string name="chapter_provider_loading_error">Can\'t load the chapter</string>
+    <string name="page_loading_error">Can\'t load page</string>
     <string name="picture_loading_error">Picture is too big to fit in memory</string>
-    <string name="offline_mode">Offline mode</string>
+
     <string name="retry">Retry</string>
     <string name="back">Back</string>
     <string name="ok">Ok</string>
