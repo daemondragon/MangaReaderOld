@@ -2,6 +2,7 @@ package vikings.mangareader;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -28,8 +29,6 @@ import vikings.mangareader.MangaFox.MangaFoxSearchLoader;
 public class MangaProviderActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<List<MangaLoader>>
 {
-    private static final String SEARCHING = "SEARCHING";
-    private static final String SEARCHING_MANGA_NAME = "SEARCHING_MANGA_NAME";
     List<MangaLoader> mangas = null;
 
     public void onCreate(Bundle savedInstanceBundle)
@@ -70,14 +69,19 @@ public class MangaProviderActivity extends AppCompatActivity
         }
     }
 
+    public void onDestroy()
+    {
+        super.onDestroy();
+        LoaderSingleton.provider.pop();
+    }
+
     public Loader<List<MangaLoader>> onCreateLoader(int id, Bundle args)
     {
         Loader<List<MangaLoader>> loader;
+        if (LoaderSingleton.provider.empty())
+            LoaderSingleton.provider.add(new MangaFoxNewsLoader(this));
 
-        if (args != null && args.getBoolean(SEARCHING, false))
-            loader = new MangaFoxSearchLoader(this, args.getString(SEARCHING_MANGA_NAME));
-        else
-            loader = new MangaFoxNewsLoader(this);
+        loader = LoaderSingleton.provider.peek();
 
         loader.forceLoad();
         return (loader);
@@ -161,10 +165,8 @@ public class MangaProviderActivity extends AppCompatActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Bundle bundle = new Bundle();
-                bundle.putBoolean(SEARCHING, true);
-                bundle.putString(SEARCHING_MANGA_NAME, query);
-                getSupportLoaderManager().restartLoader(0, bundle, MangaProviderActivity.this);
+                LoaderSingleton.provider.add(new MangaFoxSearchLoader(MangaProviderActivity.this, query));
+                startActivity(new Intent(MangaProviderActivity.this, MangaProviderActivity.class));
                 return true;
             }
 

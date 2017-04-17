@@ -1,5 +1,10 @@
 package vikings.mangareader;
 
+import android.support.v4.content.AsyncTaskLoader;
+
+import java.util.List;
+import java.util.Stack;
+
 import vikings.mangareader.Manga.MangaLoader;
 
 /**
@@ -8,5 +13,6 @@ import vikings.mangareader.Manga.MangaLoader;
  */
 class LoaderSingleton
 {
+    static Stack<AsyncTaskLoader<List<MangaLoader>>> provider = new Stack<>();
     static MangaLoader manga = null;
 }
