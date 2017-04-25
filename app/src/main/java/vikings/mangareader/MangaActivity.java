@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -52,6 +54,11 @@ public class MangaActivity extends AppCompatActivity
                 });
             }
         }).start();
+
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.dl_toolbar);
+        toolbar.inflateMenu(R.menu.download_toolbar_menu);
+        setSupportActionBar(toolbar);
     }
 
     public void onLoadFinished(final Manga to_display)
@@ -62,8 +69,8 @@ public class MangaActivity extends AppCompatActivity
             setTextIn((TextView)findViewById(R.id.manga_authors), to_display.authors());
             setTextIn((TextView)findViewById(R.id.manga_summary), to_display.summary());
             setTextIn((TextView)findViewById(R.id.manga_rating), to_display.rating() * 5 + " / 5 stars");
-            setTextIn((TextView)findViewById(R.id.manga_status), to_display.status() );
             setTextIn((TextView)findViewById(R.id.manga_genres), to_display.genres().toString());
+            setTextIn((TextView)findViewById(R.id.manga_status), to_display.status() );
 
             ((ImageView)findViewById(R.id.manga_cover)).setImageDrawable(to_display.cover());
 
@@ -132,6 +139,7 @@ public class MangaActivity extends AppCompatActivity
     private void loadChaptersList(ListView chapters_list, Manga to_display)
     {
         ArrayList<String> chapters_name = new ArrayList<>();
+
         for (Loader<Chapter> chapter : to_display.chapters)
         {
             String name = chapter.name();
@@ -142,5 +150,12 @@ public class MangaActivity extends AppCompatActivity
         chapters_list.setAdapter(new ArrayAdapter<>(MangaActivity.this,
                 R.layout.support_simple_spinner_dropdown_item,
                 chapters_name));
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.download_toolbar_menu, menu);
+        return true;
     }
 }
