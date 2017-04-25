@@ -1,33 +1,28 @@
 package vikings.mangareader.MangaFox;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
-import vikings.mangareader.Manga.MangaLoader;
 import vikings.mangareader.Utils;
 
-public class FoxMangaLoader extends MangaLoader
+class FoxMangaLoader extends Loader<Manga>
 {
-    public String url;
+    private String url;
 
-    public FoxMangaLoader(Context context, String name, String url)
+    FoxMangaLoader(String name, String url)
     {
-        super(context, name);
+        super(name);
         this.url = url;
     }
 
-    public Manga loadInBackground()
+    public Manga load()
     {
-        return (parseManga(Utils.InputStreamToString(Utils.getInputStreamFromURL(url))));
-    }
-
-    private Manga parseManga(String html)
-    {
+        String html = Utils.InputStreamToString(Utils.getInputStreamFromURL(url));
         if (html == null || "".equals(html))
             return (null);
 
@@ -93,7 +88,7 @@ public class FoxMangaLoader extends MangaLoader
             chapter_number = "Chapter" + chapter_number.substring(chapter_number.lastIndexOf(" "));
 
             String name = Utils.parseUnique(str, "<span class=\"title nowrap\">", ">", "<");
-            manga.chapters.add(new FoxChapterLoader(getContext(), name == null ? chapter_number : chapter_number + " " + name, url));
+            manga.chapters.add(new FoxChapterLoader(name == null ? chapter_number : chapter_number + " " + name, url));
         }
     }
 }

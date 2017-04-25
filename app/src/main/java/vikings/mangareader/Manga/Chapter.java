@@ -9,8 +9,8 @@ public class Chapter
     public String name;
     public String release = null;
 
-    public PageLoader first_page = null;
-    public PageLoader last_page = null;
+    public Loader<Page> first_page = null;
+    public Loader<Page> last_page = null;
 
     /**
      * Create the chapter with the given name, since it's is the only thing

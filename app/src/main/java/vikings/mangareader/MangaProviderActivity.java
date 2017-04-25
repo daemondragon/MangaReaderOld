@@ -4,8 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
+import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -21,15 +20,18 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
-import vikings.mangareader.Manga.MangaLoader;
+import vikings.mangareader.Manga.Loader;
+import vikings.mangareader.Manga.Manga;
 import vikings.mangareader.MangaFox.MangaFoxNewsLoader;
 import vikings.mangareader.MangaFox.MangaFoxSearchLoader;
 
 public class MangaProviderActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<MangaLoader>>
 {
-    List<MangaLoader> mangas = null;
+    static Stack<Loader<List<Loader<Manga>>>> mangas_providers = new Stack<>();
+
+    private List<Loader<Manga>> mangas = null;
 
     public void onCreate(Bundle savedInstanceBundle)
     {
@@ -40,14 +42,13 @@ public class MangaProviderActivity extends AppCompatActivity
         main_toolbar.inflateMenu(R.menu.main_toolbar_menu);
         setSupportActionBar(main_toolbar);
 
-
-        getSupportLoaderManager().initLoader(0, null, this);
-
-
         String[] nav_list = getResources().getStringArray(R.array.nav_drawer_list);
         DrawerLayout nav_drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ListView drawer_view = (ListView) findViewById(R.id.drawer_view);
         drawer_view.setAdapter(new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,nav_list));
+
+        if (mangas_providers.empty())
+            mangas_providers.add(new MangaFoxNewsLoader());
 
         init();
     }
@@ -62,77 +63,67 @@ public class MangaProviderActivity extends AppCompatActivity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    LoaderSingleton.manga = mangas.get(position);
-                    MangaActivity.startFrom(MangaProviderActivity.this);
+                    MangaActivity.start(MangaProviderActivity.this, mangas.get(position));
                 }
             });
         }
-    }
 
-    public void onDestroy()
-    {
-        super.onDestroy();
-        LoaderSingleton.provider.pop();
-    }
-
-    public Loader<List<MangaLoader>> onCreateLoader(int id, Bundle args)
-    {
-        Loader<List<MangaLoader>> loader;
-        if (LoaderSingleton.provider.empty())
-            LoaderSingleton.provider.add(new MangaFoxNewsLoader(this));
-
-        loader = LoaderSingleton.provider.peek();
-
-        loader.forceLoad();
-        return (loader);
-    }
-
-    public void onLoadFinished(final Loader<List<MangaLoader>> loader, List<MangaLoader> to_display)
-    {
-        if (to_display != null) {
-            mangas = to_display;
-
-            ListView manga_list_view = (ListView) findViewById(R.id.manga_list);
-            ArrayList<String> mangas_name = new ArrayList<>();
-            for (MangaLoader manga : to_display) {
-                String name = manga.name();
-                if (name != null)
-                    mangas_name.add(name);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                loadMangasList();
             }
-
-            manga_list_view.setAdapter(new ArrayAdapter<>(MangaProviderActivity.this,
-                    R.layout.support_simple_spinner_dropdown_item,
-                    mangas_name));
-        }
-        else
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MangaProviderActivity.this);
-            builder.setTitle(R.string.error)
-                    .setMessage(R.string.manga_provider_loading_error)
-                    .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            loader.forceLoad();
-                        }
-                    })
-                    .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
-                    {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            finish();
-                        }
-                    });
-            builder.create().show();
-        }
+        }).start();
     }
 
-    public void onLoaderReset(Loader<List<MangaLoader>> loader)
+    void loadMangasList()
     {
+        final List<Loader<Manga>> to_display = mangas_providers.peek().load();
+        (new Handler(getMainLooper())).post(new Runnable() {
+            @Override
+            public void run() {
+                if (to_display != null)
+                {
+                    mangas = to_display;
 
+                    ListView manga_list_view = (ListView) findViewById(R.id.manga_list);
+                    ArrayList<String> mangas_name = new ArrayList<>();
+                    for (Loader<Manga> manga : to_display) {
+                        String name = manga.name();
+                        if (name != null)
+                            mangas_name.add(name);
+                    }
+
+                    manga_list_view.setAdapter(new ArrayAdapter<>(MangaProviderActivity.this,
+                            R.layout.support_simple_spinner_dropdown_item,
+                            mangas_name));
+                }
+                else
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MangaProviderActivity.this);
+                    builder.setTitle(R.string.error)
+                            .setMessage(R.string.manga_loading_error)
+                            .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    loadMangasList();
+                                }
+                            })
+                            .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
+                            {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    finish();
+                                }
+                            });
+                    builder.create().show();
+                }
+            }
+        });
     }
 
     @Override // handler for the overflow menu of the app bar
@@ -157,15 +148,13 @@ public class MangaProviderActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         super.onCreateOptionsMenu(menu);
 
-
-
         getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                LoaderSingleton.provider.add(new MangaFoxSearchLoader(MangaProviderActivity.this, query));
+                mangas_providers.add(new MangaFoxSearchLoader(query));
                 startActivity(new Intent(MangaProviderActivity.this, MangaProviderActivity.class));
                 return true;
             }
@@ -177,5 +166,4 @@ public class MangaProviderActivity extends AppCompatActivity
         });
         return true;
     }
-    //-----------------------------------------------------------------------------------------------------
 }

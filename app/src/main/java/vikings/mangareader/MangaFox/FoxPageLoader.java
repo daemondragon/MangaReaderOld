@@ -1,30 +1,25 @@
 package vikings.mangareader.MangaFox;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Page;
-import vikings.mangareader.Manga.PageLoader;
 import vikings.mangareader.Utils;
 
-class FoxPageLoader extends PageLoader
+class FoxPageLoader extends Loader<Page>
 {
     private String url;
 
-    FoxPageLoader(Context context, String url)
+    FoxPageLoader(String url)
     {
-        super(context);
         this.url = url;
     }
 
-    public Page loadInBackground()
+    public Page load()
     {
-        return (parsePage(Utils.InputStreamToString(Utils.getInputStreamFromURL(url))));
-    }
+        String html = Utils.InputStreamToString(Utils.getInputStreamFromURL(url));
 
-    private Page parsePage(String html)
-    {
         if (html == null || "".equals(html))
             return (null);
 
@@ -57,8 +52,7 @@ class FoxPageLoader extends PageLoader
             {
                 if (!previous_page_end_url.contains("javascript") && !previous_page_end_url.contains("void") &&
                         !previous_page_end_url.contains("http"))
-                    page.previous = new FoxPageLoader(getContext(),
-                            url.substring(0, url.lastIndexOf("/") + 1) + previous_page_end_url);
+                    page.previous = new FoxPageLoader(url.substring(0, url.lastIndexOf("/") + 1) + previous_page_end_url);
                 else
                     Log.d("parsePreviousButton", "no previous page (javascript or void found in string)");
             }
@@ -80,8 +74,7 @@ class FoxPageLoader extends PageLoader
             {
                 if (!next_page_end_url.contains("javascript") && !next_page_end_url.contains("void") &&
                         !next_page_end_url.contains("http"))
-                    page.next = new FoxPageLoader(getContext(),
-                            url.substring(0, url.lastIndexOf("/") + 1) + next_page_end_url);
+                    page.next = new FoxPageLoader(url.substring(0, url.lastIndexOf("/") + 1) + next_page_end_url);
                 else
                     Log.d("parseNextButton", "no next page (javascript or void found in string)");
             }

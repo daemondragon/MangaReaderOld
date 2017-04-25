@@ -1,33 +1,22 @@
 package vikings.mangareader.MangaFox;
 
-import android.content.Context;
-
 import vikings.mangareader.Manga.Chapter;
-import vikings.mangareader.Manga.ChapterLoader;
-import vikings.mangareader.Utils;
+import vikings.mangareader.Manga.Loader;
 
-class FoxChapterLoader extends ChapterLoader
+class FoxChapterLoader extends Loader<Chapter>
 {
     private String url;
 
-    FoxChapterLoader(Context context, String name, String url)
+    FoxChapterLoader(String name, String url)
     {
-        super(context, name);
+        super(name);
         this.url = url;
     }
 
-    public Chapter loadInBackground()
+    public Chapter load()
     {
-        return (parseChapter(Utils.InputStreamToString(Utils.getInputStreamFromURL(url))));
-    }
-
-    private Chapter parseChapter(String html)
-    {
-        if (html == null || "".equals(html))
-            return (null);
-
         Chapter chapter = new Chapter(name());
-        chapter.first_page = new FoxPageLoader(getContext(), url);
+        chapter.first_page = new FoxPageLoader(url);
 
         return (chapter);
     }

@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import vikings.mangareader.Manga.MangaLoader;
+import vikings.mangareader.Manga.Loader;
+import vikings.mangareader.Manga.Manga;
 import vikings.mangareader.Utils;
 
-public class MangaFoxSearchLoader extends AsyncTaskLoader<List<MangaLoader>>
+public class MangaFoxSearchLoader extends Loader<List<Loader<Manga>>>
 {
     private List<String> genres_supported = new ArrayList<>(
             Arrays.asList("Action", "Adult", "Adventure", "Comedy", "Doujinshi", "Drama", "Ecchi", "Fantasy", "Gender Bender", "Harem",
@@ -21,13 +22,12 @@ public class MangaFoxSearchLoader extends AsyncTaskLoader<List<MangaLoader>>
 
     private String manga_to_search;
 
-    public MangaFoxSearchLoader(Context context, String manga_name_to_search)
+    public MangaFoxSearchLoader(String manga_name_to_search)
     {
-        super(context);
         manga_to_search = manga_name_to_search;
     }
 
-    public List<MangaLoader> loadInBackground()
+    public List<Loader<Manga>> load()
     {
         return (parseSearch(Utils.InputStreamToString(Utils.getInputStreamFromURL(createUrlForSerach(null)))));
     }
@@ -48,16 +48,15 @@ public class MangaFoxSearchLoader extends AsyncTaskLoader<List<MangaLoader>>
         return (url + "&released_method=eq&released=&rating_method=eq&rating=&is_completed=&advopts=1");
     }
 
-    private List<MangaLoader> parseSearch(String html)
+    private List<Loader<Manga>> parseSearch(String html)
     {
         if (html == null || "".equals(html))
             return (null);
 
-        ArrayList<MangaLoader> searched_mangas = new ArrayList<>();
+        ArrayList<Loader<Manga>> searched_mangas = new ArrayList<>();
         for (String to_parse : Utils.parseMultiple(html, "<div class=\"manga_text\">", "href=\"", "<"))
         {
-            searched_mangas.add(new FoxMangaLoader(getContext(),
-                    to_parse.substring(to_parse.indexOf(">") + 1), to_parse.substring(0, to_parse.indexOf("\"")) ));
+            searched_mangas.add(new FoxMangaLoader(to_parse.substring(to_parse.indexOf(">") + 1), to_parse.substring(0, to_parse.indexOf("\"")) ));
         }
 
         return (searched_mangas);

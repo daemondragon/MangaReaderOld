@@ -8,8 +8,8 @@ import android.graphics.drawable.Drawable;
  */
 public class Page
 {
-    public PageLoader previous = null;
-    public PageLoader next = null;
+    public Loader<Page> previous = null;
+    public Loader<Page> next = null;
     public Drawable picture = null;
     /**
      * Check if page has a previous one

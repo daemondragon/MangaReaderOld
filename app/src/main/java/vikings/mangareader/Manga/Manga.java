@@ -19,7 +19,7 @@ public class Manga
     public Drawable cover = null;
 
     public List<String> genres = null;
-    public List<ChapterLoader> chapters = null;
+    public List<Loader<Chapter>> chapters = null;
 
     /**
      * Create the manga with the given name, since it's is the only thing

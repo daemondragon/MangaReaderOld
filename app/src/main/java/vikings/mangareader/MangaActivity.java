@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,17 +20,17 @@ import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
 
-import vikings.mangareader.Manga.ChapterLoader;
+import vikings.mangareader.Manga.Chapter;
+import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
 
 public class MangaActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Manga>
 {
-    public static void startFrom(Context context)
-    {
-        if (LoaderSingleton.manga == null)
-            return;
+    public static Loader<Manga> manga;
 
+    public static void start(Context context, Loader<Manga> manga)
+    {
+        MangaActivity.manga = manga;
         context.startActivity(new Intent(context, MangaActivity.class));
     }
 
@@ -39,22 +39,22 @@ public class MangaActivity extends AppCompatActivity
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.manga_layout);
 
-        getSupportLoaderManager().initLoader(0, null, this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Manga loaded = manga.load();
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onLoadFinished(loaded);
+                    }
+                });
+            }
+        }).start();
     }
 
-    public void onDestroy()
-    {
-        super.onDestroy();
-        LoaderSingleton.manga = null;
-    }
-
-    public Loader<Manga> onCreateLoader(int id, Bundle args)
-    {
-        LoaderSingleton.manga.forceLoad();
-        return (LoaderSingleton.manga);
-    }
-
-    public void onLoadFinished(final Loader<Manga> loader, final Manga to_display)
+    public void onLoadFinished(final Manga to_display)
     {
         if (to_display != null)
         {
@@ -107,7 +107,7 @@ public class MangaActivity extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialog, int which)
                         {
-                            loader.forceLoad();
+                            onContentChanged();
                         }
                     })
                     .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
@@ -123,11 +123,6 @@ public class MangaActivity extends AppCompatActivity
         }
     }
 
-    public void onLoaderReset(Loader<Manga> loader)
-    {
-
-    }
-
     private void setTextIn(TextView view, String text)
     {
         view.setText(text != null ? text : getResources().getString(R.string.unknown));
@@ -137,7 +132,7 @@ public class MangaActivity extends AppCompatActivity
     private void loadChaptersList(ListView chapters_list, Manga to_display)
     {
         ArrayList<String> chapters_name = new ArrayList<>();
-        for (ChapterLoader chapter : to_display.chapters)
+        for (Loader<Chapter> chapter : to_display.chapters)
         {
             String name = chapter.name();
             if (name != null)
