@@ -22,17 +22,15 @@ import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
 
+import vikings.mangareader.Manga.Chapter;
 import vikings.mangareader.Manga.ChapterLoader;
 import vikings.mangareader.Manga.Manga;
 
 public class MangaActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Manga>
+
 {
     public static void startFrom(Context context)
     {
-        if (LoaderSingleton.manga == null)
-            return;
-
         context.startActivity(new Intent(context, MangaActivity.class));
     }
 
@@ -40,8 +38,6 @@ public class MangaActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.manga_layout);
-
-        getSupportLoaderManager().initLoader(0, null, this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.dl_toolbar);
         toolbar.inflateMenu(R.menu.download_toolbar_menu);
@@ -51,14 +47,8 @@ public class MangaActivity extends AppCompatActivity
     public void onDestroy()
     {
         super.onDestroy();
-        LoaderSingleton.manga = null;
     }
 
-    public Loader<Manga> onCreateLoader(int id, Bundle args)
-    {
-        LoaderSingleton.manga.forceLoad();
-        return (LoaderSingleton.manga);
-    }
 
     public void onLoadFinished(final Loader<Manga> loader, final Manga to_display)
     {
@@ -143,7 +133,7 @@ public class MangaActivity extends AppCompatActivity
     private void loadChaptersList(ListView chapters_list, Manga to_display)
     {
         ArrayList<String> chapters_name = new ArrayList<>();
-        for (ChapterLoader chapter : to_display.chapters)
+        for (Loader[Chapter] chapter : to_display.chapters)
         {
             String name = chapter.name();
             if (name != null)
