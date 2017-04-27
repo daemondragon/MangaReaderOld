@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -15,6 +16,7 @@ import android.widget.ScrollView;
 
 import java.util.List;
 
+import vikings.mangareader.Manga.AsyncLoader;
 import vikings.mangareader.Manga.Chapter;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Page;

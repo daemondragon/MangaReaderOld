@@ -1,6 +1,7 @@
 package vikings.mangareader;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,16 +23,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import vikings.mangareader.Manga.AsyncLoader;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
 import vikings.mangareader.MangaFox.MangaFoxNewsLoader;
 import vikings.mangareader.MangaFox.MangaFoxSearchLoader;
 
-public class MangaProviderActivity extends AppCompatActivity
+public class MangaProviderActivity extends AppCompatActivity implements AsyncLoader.Runnable
 {
     static Stack<Loader<List<Loader<Manga>>>> mangas_providers = new Stack<>();
 
     private List<Loader<Manga>> mangas = null;
+
+    AsyncLoader loader = new AsyncLoader();
 
     public void onCreate(Bundle savedInstanceBundle)
     {
@@ -68,62 +72,47 @@ public class MangaProviderActivity extends AppCompatActivity
             });
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                loadMangasList();
-            }
-        }).start();
+        loader.process(this);
     }
 
-    void loadMangasList()
+    public boolean run()
     {
-        final List<Loader<Manga>> to_display = mangas_providers.peek().load();
-        (new Handler(getMainLooper())).post(new Runnable() {
-            @Override
-            public void run() {
-                if (to_display != null)
-                {
-                    mangas = to_display;
+        mangas = mangas_providers.peek().load();
+        return (mangas != null);
+    }
 
-                    ListView manga_list_view = (ListView) findViewById(R.id.manga_list);
-                    ArrayList<String> mangas_name = new ArrayList<>();
-                    for (Loader<Manga> manga : to_display) {
-                        String name = manga.name();
-                        if (name != null)
-                            mangas_name.add(name);
-                    }
+    public void onSuccess()
+    {
+        ListView manga_list_view = (ListView) findViewById(R.id.manga_list);
+        ArrayList<String> mangas_name = new ArrayList<>();
+        for (Loader<Manga> manga : mangas) {
+            String name = manga.name();
+            if (name != null)
+                mangas_name.add(name);
+        }
 
-                    manga_list_view.setAdapter(new ArrayAdapter<>(MangaProviderActivity.this,
-                            R.layout.support_simple_spinner_dropdown_item,
-                            mangas_name));
-                }
-                else
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MangaProviderActivity.this);
-                    builder.setTitle(R.string.error)
-                            .setMessage(R.string.manga_loading_error)
-                            .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    loadMangasList();
-                                }
-                            })
-                            .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
-                            {
+        manga_list_view.setAdapter(new ArrayAdapter<>(MangaProviderActivity.this,
+                R.layout.support_simple_spinner_dropdown_item,
+                mangas_name));
+    }
 
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    finish();
-                                }
-                            });
-                    builder.create().show();
-                }
-            }
-        });
+    public void onError()
+    {
+    }
+
+    public boolean retry()
+    {
+        return (true);
+    }
+
+    public String errorDescription()
+    {
+        return (getResources().getString(R.string.manga_provider_loading_error));
+    }
+
+    public Context context()
+    {
+        return (this);
     }
 
     @Override // handler for the overflow menu of the app bar
