@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import vikings.mangareader.R;
 
-public class AsyncLoader
+public class AsyncRunner
 {
     private BlockingQueue<Runnable> transfer = new LinkedBlockingQueue<>();
     private boolean process_runnable;
@@ -56,22 +56,40 @@ public class AsyncLoader
         Context context();
     }
 
-    public AsyncLoader()
+    /**
+     * Create a new loader.
+     * Start a new thread.
+     */
+    public AsyncRunner()
     {
         process_runnable = false;//Just to run startProcessing the first time
         startProcessing();
     }
 
+    /**
+     * Put the Runnable in the process queue. When all previous Runnable have been ran, it will be processed.
+     * @param run the runnable to process.
+     */
     public void process(Runnable run)
     {
         transfer.offer(run);
     }
 
+    /**
+     * Stop the process of all runnable.
+     * The runnable which is currently processed will not be terminated
+     * but will not be able to retry (It will be replace in the process queue).
+     * To process again Runnable, startProcessing must be called
+     */
     public void stopProcessing()
     {
         process_runnable = false;
     }
 
+    /**
+     * Have to be called after a call of stopProcessing.
+     * stopProcessing haven't be called before, nothing is done.
+     */
     public void startProcessing()
     {
         if (!process_runnable)
@@ -131,7 +149,7 @@ public class AsyncLoader
                     }
                     catch (Exception e)
                     {
-                        Log.d("AsyncLoader", e.toString());
+                        Log.d("AsyncRunner", e.toString());
                     }
                 }
             }).start();

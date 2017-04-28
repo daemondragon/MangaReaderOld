@@ -1,49 +1,43 @@
 package vikings.mangareader.Database;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
 
-public class DatabaseMangaLoader extends Loader<Manga>
+class DatabaseMangaLoader extends Loader<Manga>
 {
-    private SQLiteDatabase db;
+    private String manga_path;
 
-    DatabaseMangaLoader(@NonNull SQLiteDatabase db, @NonNull String manga_name)
+    DatabaseMangaLoader(@NonNull String manga_path)
     {
-        super(manga_name);
-        this.db = db;
+        super(manga_path.substring(manga_path.lastIndexOf("/") + 1));
+        this.manga_path = manga_path;
     }
 
     public Manga load()
     {
-        Cursor cursor = db.query(DatabaseOpenHelper.MANGA_TABLE, null,
-                DatabaseOpenHelper.MANGA_NAME + "=" + name(), null, null, null, null);
+        File manga_dir = new File(manga_path);
+        if (!manga_dir.isDirectory())
+            return (null);
 
-        Manga manga = null;
-        if (cursor.moveToFirst())
-        {
-            manga = new Manga(name());
-            manga.authors = cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.MANGA_AUTHORS));
-            manga.genres = Arrays.asList(cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.MANGA_GENRES))
-                    .split(DatabaseOpenHelper.LIST_SEPARATOR));
-            manga.cover = null;
-            manga.summary = cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.MANGA_SUMMARY));
-            manga.rating = cursor.getFloat(cursor.getColumnIndex(DatabaseOpenHelper.MANGA_RATING));
-            manga.status = null;
+        Manga manga = new Manga(name());
 
-            manga.chapters = new ArrayList<>();
-            for (String chapter_name : cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.MANGA_CHAPTERS))
-                    .split(DatabaseOpenHelper.LIST_SEPARATOR))
-                manga.chapters.add(new DatabaseChapterLoader(db, name(), chapter_name));
-        }
+        List<String> chapters = new ArrayList<>();
+        for (File chapter : manga_dir.listFiles())
+            if (chapter.isDirectory())
+                chapters.add(chapter.getAbsolutePath());
 
-        cursor.close();
+        Collections.sort(chapters);
+        manga.chapters = new ArrayList<>();
+        for (String chapter : chapters)
+            manga.chapters.add(new DatabaseChapterLoader(chapter));
+
         return (manga);
     }
 }

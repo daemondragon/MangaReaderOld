@@ -2,11 +2,8 @@ package vikings.mangareader;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -16,7 +13,7 @@ import android.widget.ScrollView;
 
 import java.util.List;
 
-import vikings.mangareader.Manga.AsyncLoader;
+import vikings.mangareader.Manga.AsyncRunner;
 import vikings.mangareader.Manga.Chapter;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Page;
@@ -30,7 +27,7 @@ public class PageActivity extends AppCompatActivity
     static private Chapter current_chapter = null;
     private GestureDetector detector;
 
-    private AsyncLoader loader = new AsyncLoader();
+    private AsyncRunner loader = new AsyncRunner();
 
     public static void start(Context context, List<Loader<Chapter>> chapters, int chapter_index)
     {
@@ -109,7 +106,7 @@ public class PageActivity extends AppCompatActivity
         });
     }
 
-    private class ChapterLoader implements AsyncLoader.Runnable
+    private class ChapterLoader implements AsyncRunner.Runnable
     {
         private Loader<Chapter> to_load;
         private boolean first_page;
@@ -155,7 +152,7 @@ public class PageActivity extends AppCompatActivity
         }
     }
 
-    private class PageLoader implements AsyncLoader.Runnable
+    private class PageLoader implements AsyncRunner.Runnable
     {
         private Loader<Page> to_load;
 

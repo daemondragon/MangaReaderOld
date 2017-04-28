@@ -1,15 +1,12 @@
 package vikings.mangareader;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,21 +15,23 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
 
-import vikings.mangareader.Manga.AsyncLoader;
+import vikings.mangareader.Database.DatabaseMangaSaver;
+import vikings.mangareader.Manga.AsyncRunner;
 import vikings.mangareader.Manga.Chapter;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
 
-public class MangaActivity extends AppCompatActivity implements AsyncLoader.Runnable
+public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runnable
 {
     public static Loader<Manga> manga;
 
-    private AsyncLoader loader = new AsyncLoader();
-    private Manga to_display;
+    private AsyncRunner loader = new AsyncRunner();
+    private Manga to_display = null;
 
     public static void start(Context context, Loader<Manga> manga)
     {
@@ -64,7 +63,7 @@ public class MangaActivity extends AppCompatActivity implements AsyncLoader.Runn
         setTextIn((TextView)findViewById(R.id.manga_authors), to_display.authors());
         setTextIn((TextView)findViewById(R.id.manga_summary), to_display.summary());
         setTextIn((TextView)findViewById(R.id.manga_rating), to_display.rating() * 5 + " / 5 stars");
-        setTextIn((TextView)findViewById(R.id.manga_genres), to_display.genres().toString());
+        setTextIn((TextView)findViewById(R.id.manga_genres), (to_display.genres() != null ? to_display.genres().toString() : null));
         setTextIn((TextView)findViewById(R.id.manga_status), to_display.status() );
 
         ((ImageView)findViewById(R.id.manga_cover)).setImageDrawable(to_display.cover());
@@ -146,5 +145,24 @@ public class MangaActivity extends AppCompatActivity implements AsyncLoader.Runn
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.download_toolbar_menu, menu);
         return true;
+    }
+
+    @Override // handler for the overflow menu of the app bar
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.select_download:
+                if (to_display != null) {
+                    DatabaseMangaSaver saver = new DatabaseMangaSaver(context());
+                    saver.save(to_display, to_display.chapters);
+                }
+                return true;
+
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }

@@ -1,10 +1,11 @@
 package vikings.mangareader.Database;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import java.util.Arrays;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import vikings.mangareader.Manga.Chapter;
@@ -12,36 +13,32 @@ import vikings.mangareader.Manga.Loader;
 
 class DatabaseChapterLoader extends Loader<Chapter>
 {
-    private SQLiteDatabase db;
-    private String manga_name;
+    private String chapter_path;
 
-    DatabaseChapterLoader(@NonNull SQLiteDatabase db, @NonNull String manga_name,@NonNull String chapter_name)
+    DatabaseChapterLoader(@NonNull String chapter_path)
     {
-        super(chapter_name);
-        this.db = db;
-        this.manga_name = manga_name;
+        super(chapter_path.substring(chapter_path.lastIndexOf("/") + 1));
+        this.chapter_path = chapter_path;
     }
 
     public Chapter load()
     {
-        String[] columns = { DatabaseOpenHelper.CHAPTER_PAGES };
-        Cursor cursor = db.query(DatabaseOpenHelper.CHAPTER_TABLE,
-                columns,
-                DatabaseOpenHelper.MANGA_NAME + "=" + manga_name + " AND " + DatabaseOpenHelper.CHAPTER_NAME + "=" + name(),
-                null, null, null, null);
+        File chapter_dir = new File(chapter_path);
+        if (!chapter_dir.isDirectory())
+            return (null);
 
-        Chapter chapter = null;
-        if (cursor.moveToFirst())
-        {
-            chapter = new Chapter(name());
-            List<String> list = Arrays.asList(cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.CHAPTER_PAGES))
-                                                    .split(DatabaseOpenHelper.LIST_SEPARATOR));
+        List<String> pages = new ArrayList<>();
+        for (File page : chapter_dir.listFiles())
+            if (page.isFile())
+                pages.add(page.getAbsolutePath());
 
-            chapter.first_page = new DatabasePageLoader(list, 0);
-            chapter.last_page = new DatabasePageLoader(list, list.size() - 1);
-        }
+        Collections.sort(pages);
+        if (pages.isEmpty())
+            return (null);
 
-        cursor.close();
+        Chapter chapter = new Chapter(name());
+        chapter.first_page = new DatabasePageLoader(pages, 0);
+        chapter.last_page = new DatabasePageLoader(pages, pages.size() - 1);
         return (chapter);
     }
 }

@@ -1,11 +1,8 @@
 package vikings.mangareader;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -23,19 +20,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import vikings.mangareader.Manga.AsyncLoader;
+import vikings.mangareader.Database.DatabaseMangasListLoader;
+import vikings.mangareader.Manga.AsyncRunner;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
 import vikings.mangareader.MangaFox.MangaFoxNewsLoader;
 import vikings.mangareader.MangaFox.MangaFoxSearchLoader;
 
-public class MangaProviderActivity extends AppCompatActivity implements AsyncLoader.Runnable
+public class MangaProviderActivity extends AppCompatActivity implements AsyncRunner.Runnable
 {
     static Stack<Loader<List<Loader<Manga>>>> mangas_providers = new Stack<>();
 
     private List<Loader<Manga>> mangas = null;
 
-    AsyncLoader loader = new AsyncLoader();
+    AsyncRunner loader = new AsyncRunner();
 
     public void onCreate(Bundle savedInstanceBundle)
     {
@@ -121,6 +119,8 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncLoa
             case R.id.action_advanced_search:
                 Toast debug = Toast.makeText(getApplicationContext(),"advanced search",Toast.LENGTH_LONG);
                 debug.show();
+                mangas_providers.add(new DatabaseMangasListLoader(context()));
+                startActivity(new Intent(MangaProviderActivity.this, MangaProviderActivity.class));
                 return true;
 
 
