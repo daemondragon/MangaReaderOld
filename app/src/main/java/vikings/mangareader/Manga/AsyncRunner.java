@@ -7,14 +7,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import vikings.mangareader.R;
 
 public class AsyncRunner
 {
-    private BlockingQueue<Runnable> transfer = new LinkedBlockingQueue<>();
+    private BlockingDeque<Runnable> transfer = new LinkedBlockingDeque<>();
     private boolean process_runnable;
 
     public interface Runnable
@@ -76,6 +76,15 @@ public class AsyncRunner
     }
 
     /**
+     * Put the Runnable in the front of the process queue, bypassing all previous inserted Runnable.
+     * @param run the runnable to process.
+     */
+    public void forceProcess(Runnable run)
+    {
+        transfer.addFirst(run);
+    }
+
+    /**
      * Stop the process of all runnable.
      * The runnable which is currently processed will not be terminated
      * but will not be able to retry (It will be replace in the process queue).
@@ -117,8 +126,8 @@ public class AsyncRunner
                                     public void run() {
                                         if (to_run.retry())
                                         {
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(to_run.context());
-                                            builder.setTitle(R.string.error)
+                                            AlertDialog dialog = new AlertDialog.Builder(to_run.context())
+                                                    .setTitle(R.string.error)
                                                     .setMessage(to_run.errorDescription())
                                                     .setCancelable(false)
                                                     .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
@@ -126,7 +135,7 @@ public class AsyncRunner
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which)
                                                         {
-                                                            transfer.offer(to_run);
+                                                            transfer.offerFirst(to_run);
                                                         }
                                                     })
                                                     .setNegativeButton(R.string.back, new DialogInterface.OnClickListener()
@@ -137,8 +146,9 @@ public class AsyncRunner
                                                         {
                                                             to_run.onError();
                                                         }
-                                                    });
-                                            builder.create().show();
+                                                    }).create();
+
+                                            dialog.show();
                                         }
                                         else
                                             to_run.onError();

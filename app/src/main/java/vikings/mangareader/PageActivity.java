@@ -54,8 +54,6 @@ public class PageActivity extends AppCompatActivity
         return (super.dispatchTouchEvent(e));
     }
 
-
-
     public void init()
     {
         loader.process(new ChapterLoader(chapters.get(chapter_index), true));
@@ -120,7 +118,7 @@ public class PageActivity extends AppCompatActivity
         public boolean run()
         {
             PageActivity.current_chapter = to_load.load();
-            return (PageActivity.current_chapter != null);
+            return (PageActivity.current_chapter != null && PageActivity.current_chapter.first_page != null);
         }
 
         public void onSuccess()

@@ -55,6 +55,12 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
         init();
     }
 
+    public void onResume()
+    {
+        super.onResume();
+        loader.process(this);
+    }
+
     public void init()
     {
         ListView list = (ListView) findViewById(R.id.manga_list);
@@ -69,8 +75,6 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
                 }
             });
         }
-
-        loader.process(this);
     }
 
     public boolean run()

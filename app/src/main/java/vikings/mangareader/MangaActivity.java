@@ -44,11 +44,15 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.manga_layout);
 
-        loader.process(this);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.dl_toolbar);
         toolbar.inflateMenu(R.menu.download_toolbar_menu);
         setSupportActionBar(toolbar);
+    }
+
+    public void onResume()
+    {
+        super.onResume();
+        loader.process(this);
     }
 
     public boolean run()

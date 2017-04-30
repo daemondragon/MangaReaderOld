@@ -33,12 +33,13 @@ class DatabaseChapterLoader extends Loader<Chapter>
                 pages.add(page.getAbsolutePath());
 
         Collections.sort(pages);
-        if (pages.isEmpty())
-            return (null);
 
         Chapter chapter = new Chapter(name());
-        chapter.first_page = new DatabasePageLoader(pages, 0);
-        chapter.last_page = new DatabasePageLoader(pages, pages.size() - 1);
+        if (!pages.isEmpty())
+        {
+            chapter.first_page = new DatabasePageLoader(pages, 0);
+            chapter.last_page = new DatabasePageLoader(pages, pages.size() - 1);
+        }
         return (chapter);
     }
 }

@@ -18,6 +18,10 @@ class FoxChapterLoader extends Loader<Chapter>
         Chapter chapter = new Chapter(name());
         chapter.first_page = new FoxPageLoader(url);
 
+        int index = url.lastIndexOf("/");
+        if (index != -1)//MangaFox technique used to get last page
+            chapter.last_page = new FoxPageLoader(url.substring(0, index) + "/999.html");
+
         return (chapter);
     }
 }
