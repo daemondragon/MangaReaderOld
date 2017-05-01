@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+
+<LinearLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="vikings.mangareader.SelectDownloadActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
 
-    <android.support.design.widget.AppBarLayout
+<android.support.v7.widget.Toolbar
+    android:id="@+id/dl_toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppBarOverlay">
+        android:layout_height="match_parent"
+        android:choiceMode="multipleChoice"
+        android:id="@+id/select_dl"
+        />
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
-
-
-    </android.support.design.widget.CoordinatorLayout>
+    </LinearLayout>

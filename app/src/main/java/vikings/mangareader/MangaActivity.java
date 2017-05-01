@@ -188,8 +188,11 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
         switch (item.getItemId()) {
             case R.id.select_download:
                 if (to_display != null) {
+                    /*
                     DatabaseMangaSaver saver = new DatabaseMangaSaver(context());
                     saver.save(to_display, to_display.chapters);
+                    */
+                    SelectDownloadActivity.start(this, to_display);
                 }
                 return true;
 
