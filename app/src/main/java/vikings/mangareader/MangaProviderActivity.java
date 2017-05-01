@@ -35,6 +35,8 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
 
     AsyncRunner loader = new AsyncRunner();
 
+
+
     public void onCreate(Bundle savedInstanceBundle)
     {
         super.onCreate(savedInstanceBundle);
@@ -44,10 +46,7 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
         main_toolbar.inflateMenu(R.menu.main_toolbar_menu);
         setSupportActionBar(main_toolbar);
 
-        String[] nav_list = getResources().getStringArray(R.array.nav_drawer_list);
-        DrawerLayout nav_drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ListView drawer_view = (ListView) findViewById(R.id.drawer_view);
-        drawer_view.setAdapter(new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,nav_list));
+        init_drawer();
 
         if (mangas_providers.empty())
             mangas_providers.add(new MangaFoxNewsLoader());
@@ -75,6 +74,38 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
                 }
             });
         }
+    }
+
+    /**
+     * init the on click listener for the drawer list not the image button yet
+     *  !!!!!! to do link the image button !!!!!!!
+     */
+    public void init_drawer()
+    {
+        String[] nav_list = getResources().getStringArray(R.array.nav_drawer_list);
+        ListView drawer_list = (ListView) findViewById(R.id.drawer_view);
+        drawer_list.setAdapter(new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,nav_list));
+        drawer_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (position){
+                    case 0 :
+                        (Toast.makeText(view.getContext(),"home",Toast.LENGTH_LONG)).show();
+                        break;
+                    case 1 :
+                        (Toast.makeText(view.getContext(),"bookmark",Toast.LENGTH_LONG)).show();
+                        break;
+                    case 2 :
+                        (Toast.makeText(view.getContext(),"downloads",Toast.LENGTH_LONG)).show();
+                        break;
+                    case 3 :
+                        (Toast.makeText(view.getContext(),"settings",Toast.LENGTH_LONG)).show();
+                        break;
+                    default: (Toast.makeText(view.getContext(),"dafuck",Toast.LENGTH_LONG)).show();
+                        break;
+                }
+            }
+        });
     }
 
     public boolean run()

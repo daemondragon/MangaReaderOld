@@ -47,6 +47,7 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
         Toolbar toolbar = (Toolbar) findViewById(R.id.dl_toolbar);
         toolbar.inflateMenu(R.menu.download_toolbar_menu);
         setSupportActionBar(toolbar);
+        init_drawer();
     }
 
     public void onResume()
@@ -61,6 +62,37 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
         return (to_display != null);
     }
 
+    /**
+     * init the on click listener for the drawer list not the image button yet
+     *  !!!!!! to do link the image button !!!!!!!
+     */
+    public void init_drawer()
+    {
+        String[] nav_list = getResources().getStringArray(R.array.nav_drawer_list);
+        ListView drawer_list = (ListView) findViewById(R.id.drawer_view);
+        drawer_list.setAdapter(new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,nav_list));
+        drawer_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (position){
+                    case 0 :
+                        (Toast.makeText(view.getContext(),"home",Toast.LENGTH_LONG)).show();
+                        break;
+                    case 1 :
+                        (Toast.makeText(view.getContext(),"bookmark",Toast.LENGTH_LONG)).show();
+                        break;
+                    case 2 :
+                        (Toast.makeText(view.getContext(),"downloads",Toast.LENGTH_LONG)).show();
+                        break;
+                    case 3 :
+                        (Toast.makeText(view.getContext(),"settings",Toast.LENGTH_LONG)).show();
+                        break;
+                    default: (Toast.makeText(view.getContext(),"dafuck",Toast.LENGTH_LONG)).show();
+                        break;
+                }
+            }
+        });
+    }
     public void onSuccess()
     {
         setTextIn((TextView)findViewById(R.id.manga_name), to_display.name());
