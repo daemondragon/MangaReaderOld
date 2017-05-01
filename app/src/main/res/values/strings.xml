@@ -18,6 +18,7 @@
     <string name="chapter_loading_error">Can\'t load the chapter</string>
     <string name="page_loading_error">Can\'t load page</string>
     <string name="picture_loading_error">Picture is too big to fit in memory</string>
+    <string name="manga_removing_error">Can\'t remove some chapters</string>
 
     <string name="retry">Retry</string>
     <string name="back">Back</string>
