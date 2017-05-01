@@ -37,11 +37,12 @@ public class DatabaseMangaRemover implements AsyncRunner.Runnable
         {
             File chapter = new File(manga_dir, chapter_name);
             if (chapter.exists())
-                chapter.delete();
+                deleteRecursively(chapter);
         }
 
         if (manga_dir.listFiles().length == 0)
         {
+            deleteRecursively(manga_dir);
             SQLiteDatabase db = (new DatabaseOpenHelper(context())).getWritableDatabase();
             if (db.isOpen())
             {
@@ -75,5 +76,14 @@ public class DatabaseMangaRemover implements AsyncRunner.Runnable
     public Context context()
     {
         return (context);
+    }
+
+    private void deleteRecursively(File file_or_directory)
+    {
+        if (file_or_directory.isDirectory())
+            for (File child : file_or_directory.listFiles())
+                deleteRecursively(child);
+
+        file_or_directory.delete();
     }
 }
