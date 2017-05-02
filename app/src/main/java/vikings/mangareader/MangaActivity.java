@@ -93,6 +93,7 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
             }
         });
     }
+
     public void onSuccess()
     {
         setTextIn((TextView)findViewById(R.id.manga_name), to_display.name());

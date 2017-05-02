@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MangaActivity" />
-        <activity android:name=".PageActivity" />
+        <activity android:name=".PageActivity"
+            android:theme="@style/Theme.AppCompat.Light"/>
         <activity
             android:name=".SelectDownloadActivity"
             android:label="@string/title_activity_select_download"

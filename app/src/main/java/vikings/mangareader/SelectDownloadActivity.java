@@ -39,7 +39,7 @@ public class SelectDownloadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_download);
 
-        dl_list = (ListView) findViewById(R.id.select_dl);
+        dl_list = (ListView) findViewById(R.id.select_download);
 
         ArrayList<String> chapters_name = new ArrayList<>();
         for (Loader<Chapter> chapter : manga_to_dl.chapters)
