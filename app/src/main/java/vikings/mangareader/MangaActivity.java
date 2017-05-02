@@ -3,6 +3,7 @@ package vikings.mangareader;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -93,9 +94,13 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
             }
         });
     }
+
     public void onSuccess()
     {
-        setTextIn((TextView)findViewById(R.id.manga_name), to_display.name());
+        ActionBar toolbar = getSupportActionBar();
+        if (toolbar != null)
+            toolbar.setTitle(to_display.name());
+
         setTextIn((TextView)findViewById(R.id.manga_authors), to_display.authors());
         setTextIn((TextView)findViewById(R.id.manga_summary), to_display.summary());
         setTextIn((TextView)findViewById(R.id.manga_rating), to_display.rating() * 5 + " / 5 stars");

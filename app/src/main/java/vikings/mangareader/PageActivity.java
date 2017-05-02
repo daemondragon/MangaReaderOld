@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -123,6 +125,11 @@ public class PageActivity extends AppCompatActivity
 
         public void onSuccess()
         {
+            ActionBar toolbar = getSupportActionBar();
+            if (toolbar != null)
+                    toolbar.setTitle(PageActivity.current_chapter.name());
+
+
             if (first_page)
                 loader.process(new PageLoader(PageActivity.current_chapter.first_page));
             else

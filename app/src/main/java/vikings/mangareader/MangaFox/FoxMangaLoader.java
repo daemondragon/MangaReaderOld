@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
@@ -30,7 +31,13 @@ class FoxMangaLoader extends Loader<Manga>
 
         manga.summary = Utils.fromHtmlString(Utils.parseUnique(html, "<p class=\"summary\">", ">", "</p>"));
         manga.authors = Utils.parseUnique(html, "href=\"/search/artist/", ">", "<");
-        manga.genres = Utils.parseMultiple(html, "<a href=\"http://mangafox.me/search/genres/", ">", "<");
+        List<String> temp = Utils.parseMultiple(html, "<a href=\"http://mangafox.me/search/genres/", ">", "<");
+        if (!temp.isEmpty())
+        {
+            manga.genres = temp.get(0);
+            for (int i = 1; i < temp.size(); ++i)
+                manga.genres += ", " + temp.get(i);
+        }
 
         parseStatusAndRating(html, manga);
         parseCover(html, manga);
