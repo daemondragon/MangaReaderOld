@@ -12,7 +12,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:weightSum="3">
     <android.support.v7.widget.Toolbar
         android:id="@+id/dl_toolbar"
         android:layout_width="match_parent"
@@ -21,7 +22,6 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -38,30 +38,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/manga_cover"
-            android:layout_toEndOf="@id/manga_cover">
-            <TableRow>
-                <TextView
-                    android:text="@string/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingRight="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingStart="8dp"/>
-                <TextView
-                    android:id="@+id/manga_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </TableRow>
+            android:layout_toEndOf="@id/manga_cover"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:padding="8dp"
+            android:shrinkColumns="1">
             <TableRow>
                 <TextView
                     android:text="@string/authors"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingStart="8dp"/>
+                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"/>
                 <TextView
                     android:id="@+id/manga_authors"
                     android:layout_width="wrap_content"
@@ -72,10 +60,8 @@
                     android:text="@string/genres"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingStart="8dp"/>
+                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"/>
                 <TextView
                     android:id="@+id/manga_genres"
                     android:layout_width="wrap_content"
@@ -86,10 +72,8 @@
                     android:text="@string/status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingStart="8dp"/>
+                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"/>
                 <TextView
                     android:id="@+id/manga_status"
                     android:layout_width="wrap_content"
@@ -100,10 +84,8 @@
                     android:text="@string/rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingStart="8dp"/>
+                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"/>
                 <TextView
                     android:id="@+id/manga_rating"
                     android:layout_width="wrap_content"
@@ -157,6 +139,7 @@
                 android:padding="8dp"/>
         </ScrollView>
     </ViewSwitcher>
+
 </LinearLayout>
     <RelativeLayout
         android:id="@+id/left_drawer"

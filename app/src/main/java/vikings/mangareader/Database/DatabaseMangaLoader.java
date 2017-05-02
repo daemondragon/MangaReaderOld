@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -47,7 +46,7 @@ class DatabaseMangaLoader extends Loader<Manga>
                 manga.summary = cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.SUMMARY));
                 manga.status = cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.STATUS));
                 manga.rating = cursor.getFloat(cursor.getColumnIndex(DatabaseOpenHelper.RATING));
-                manga.genres = Arrays.asList(cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.GENRES)).split(","));
+                manga.genres = cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.GENRES));
             }
             cursor.close();
         }

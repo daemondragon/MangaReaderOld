@@ -18,7 +18,7 @@ public class Manga
     public float rating = 0.f;
     public Drawable cover = null;
 
-    public List<String> genres = null;
+    public String genres = "";
     public List<Loader<Chapter>> chapters = null;
 
     /**
@@ -77,10 +77,10 @@ public class Manga
     }
 
     /**
-     * Get a list of all genres.
-     * @return a list of genre. An empty list is returned if no genre is provided.
+     * Get all genres in a string.
+     * @return all genres. An empty string is returned if no genre is provided.
      */
-    public List<String> genres()
+    public String genres()
     {
         return (genres);
     }

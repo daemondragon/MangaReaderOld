@@ -64,7 +64,7 @@ public class DatabaseMangaSaver
             values.put(DatabaseOpenHelper.SUMMARY, manga.summary());
             values.put(DatabaseOpenHelper.STATUS, manga.status());
             values.put(DatabaseOpenHelper.RATING, manga.rating());
-            values.put(DatabaseOpenHelper.GENRES, manga.genres().toString());
+            values.put(DatabaseOpenHelper.GENRES, manga.genres());
 
 
             String[] columns = { DatabaseOpenHelper.NAME };
