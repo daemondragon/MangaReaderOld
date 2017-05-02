@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MangaReader</string>
+    <string name="app_name">FoxReader</string>
 
     <string name="loading">Loading&#8230;</string>
     <string name="show_summary">Show summary</string>
