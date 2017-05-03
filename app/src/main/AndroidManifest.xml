@@ -20,11 +20,12 @@
         </activity>
         <activity android:name=".MangaActivity" />
         <activity android:name=".PageActivity"
-            android:theme="@style/Theme.AppCompat.Light"/>
+            android:theme="@style/Theme.AppCompat.Light"/><!-- Need the default action bar -->
         <activity
             android:name=".SelectDownloadActivity"
-            android:label="@string/title_activity_select_download"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:label="@string/title_activity_select_download" />
+
+        <activity android:name=".DownloadOrRemoveActivity"/>
     </application>
 
 </manifest>

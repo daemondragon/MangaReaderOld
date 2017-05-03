@@ -32,6 +32,7 @@
     <string name="advanced">Advanced</string>
     <string name="settings">Settings</string>
     <string name="title_activity_select_download">SelectDownloadActivity</string>
-
+    <string name="download">Download</string>
+    <string name="remove">Remove</string>
 
 </resources>
