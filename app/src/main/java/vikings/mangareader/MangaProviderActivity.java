@@ -35,8 +35,6 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
 
     AsyncRunner loader = new AsyncRunner();
 
-
-
     public void onCreate(Bundle savedInstanceBundle)
     {
         super.onCreate(savedInstanceBundle);

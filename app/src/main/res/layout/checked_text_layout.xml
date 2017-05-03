@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight">
+    android:layout_height="?android:attr/listPreferredItemHeightSmall">
 
     <CheckedTextView
         android:id="@+id/checked_text_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-        android:checked="false"/>
-</LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
+        android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+        android:checked="false" />
+</RelativeLayout>

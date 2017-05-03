@@ -6,15 +6,20 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.CheckedTextView;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import vikings.mangareader.Manga.Chapter;
@@ -27,12 +32,14 @@ public class DownloadOrRemoveActivity extends AppCompatActivity
     private boolean download;
     static Manga manga;
 
+    boolean[] checked;
+
     public void onCreate(Bundle savedInstanceBundle)
     {
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.download_or_remove_layout);
 
-        download = savedInstanceBundle.getBoolean(DOWNLOAD, true);
+        download = getIntent().getBooleanExtra(DOWNLOAD, true);
         Toolbar toolbar = (Toolbar) findViewById(R.id.download_or_remove_toolbar);
         if (toolbar != null)
         {
@@ -42,7 +49,22 @@ public class DownloadOrRemoveActivity extends AppCompatActivity
         else
             Log.d("DownloadOrRemoveAct", "can't find toolbar");
 
-        ((ListView) findViewById(R.id.checked_list)).setAdapter(new CheckedTextAdaptor(this, manga.chapters));
+        final ListView list_view = (ListView) findViewById(R.id.checked_list);
+        checked = new boolean[manga.chapters.size()];
+        for (int i = 0; i < checked.length; ++i)
+            checked[i] = false;
+
+        list_view.setAdapter(new CheckedTextAdapter(this, manga.chapters));
+
+        findViewById(R.id.select_all).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                CheckBox c_v = (CheckBox) v;
+                for (int i = 0; i < checked.length; ++i)
+                    checked[i] = c_v.isChecked();
+
+                list_view.invalidateViews();//Used to refresh on-screen item
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -69,12 +91,12 @@ public class DownloadOrRemoveActivity extends AppCompatActivity
         return true;
     }
 
-    class CheckedTextAdaptor extends BaseAdapter
+    private class CheckedTextAdapter extends BaseAdapter
     {
         private Context context;
         private List<Loader<Chapter>> names;
 
-        CheckedTextAdaptor(Context context,@NonNull List<Loader<Chapter>> chapters)
+        CheckedTextAdapter(Context context,@NonNull List<Loader<Chapter>> chapters)
         {
             this.context = context;
             names = chapters;
@@ -92,9 +114,9 @@ public class DownloadOrRemoveActivity extends AppCompatActivity
             return (position);
         }
 
-        public View getView(int position, View convertView, ViewGroup parent)
+        public View getView(final int position, View convertView, ViewGroup parent)
         {
-            ViewHolder holder;
+            final ViewHolder holder;
             if (convertView == null) {
                 holder = new ViewHolder();
 
@@ -108,6 +130,15 @@ public class DownloadOrRemoveActivity extends AppCompatActivity
                 holder = (ViewHolder) convertView.getTag();
 
             holder.text_view.setText(names.get(position).name());
+            holder.text_view.setChecked(checked[position]);
+            holder.text_view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CheckedTextView c_v = (CheckedTextView)v;
+                    c_v.toggle();
+                    checked[position] = c_v.isChecked();
+                }
+            });
             return (convertView);
         }
 

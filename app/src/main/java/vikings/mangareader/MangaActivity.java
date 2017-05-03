@@ -82,6 +82,10 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
                         (Toast.makeText(view.getContext(),"bookmark",Toast.LENGTH_LONG)).show();
                         break;
                     case 2 :
+                        DownloadOrRemoveActivity.manga = to_display;
+                        Intent launcher = new Intent(MangaActivity.this, DownloadOrRemoveActivity.class);
+                        launcher.putExtra(DownloadOrRemoveActivity.DOWNLOAD, true);
+                        startActivity(launcher);
                         (Toast.makeText(view.getContext(),"downloads",Toast.LENGTH_LONG)).show();
                         break;
                     case 3 :
