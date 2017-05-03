@@ -21,7 +21,6 @@ import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
 
-import vikings.mangareader.Database.DatabaseMangaSaver;
 import vikings.mangareader.Manga.AsyncRunner;
 import vikings.mangareader.Manga.Chapter;
 import vikings.mangareader.Manga.Loader;

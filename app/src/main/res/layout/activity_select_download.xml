@@ -17,23 +17,19 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/select_all"
-        android:layout_centerVertical="true"
-        />
+        android:layout_centerVertical="true"/>
 
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@mipmap/dl_start"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@mipmap/ic_start_download"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:id="@+id/dl_start"
-        android:onClick="start_download"
-        />
-
-
-</RelativeLayout>
+        android:onClick="start_download"/>
+    </RelativeLayout>
 
     <ListView
         android:layout_width="match_parent"
@@ -42,4 +38,4 @@
         android:id="@+id/select_download"
         />
 
-    </LinearLayout>
+</LinearLayout>
