@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
@@ -26,7 +24,7 @@ import vikings.mangareader.Manga.Chapter;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
 
-public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runnable
+public class MangaActivity extends DrawerActivity implements AsyncRunner.Runnable
 {
     public static Loader<Manga> manga;
 
@@ -47,7 +45,7 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
         Toolbar toolbar = (Toolbar) findViewById(R.id.dl_toolbar);
         toolbar.inflateMenu(R.menu.download_toolbar_menu);
         setSupportActionBar(toolbar);
-        init_drawer();
+        initDrawer();
     }
 
     public void onResume()
@@ -62,42 +60,6 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
         return (to_display != null);
     }
 
-    /**
-     * init the on click listener for the drawer list not the image button yet
-     *  !!!!!! to do link the image button !!!!!!!
-     */
-    public void init_drawer()
-    {
-        String[] nav_list = getResources().getStringArray(R.array.nav_drawer_list);
-        ListView drawer_list = (ListView) findViewById(R.id.drawer_view);
-        drawer_list.setAdapter(new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,nav_list));
-        drawer_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position){
-                    case 0 :
-                        (Toast.makeText(view.getContext(),"home",Toast.LENGTH_LONG)).show();
-                        break;
-                    case 1 :
-                        (Toast.makeText(view.getContext(),"bookmark",Toast.LENGTH_LONG)).show();
-                        break;
-                    case 2 :
-                        DownloadOrRemoveActivity.manga = to_display;
-                        Intent launcher = new Intent(MangaActivity.this, DownloadOrRemoveActivity.class);
-                        launcher.putExtra(DownloadOrRemoveActivity.DOWNLOAD, true);
-                        startActivity(launcher);
-                        (Toast.makeText(view.getContext(),"downloads",Toast.LENGTH_LONG)).show();
-                        break;
-                    case 3 :
-                        (Toast.makeText(view.getContext(),"settings",Toast.LENGTH_LONG)).show();
-                        break;
-                    default: (Toast.makeText(view.getContext(),"dafuck",Toast.LENGTH_LONG)).show();
-                        break;
-                }
-            }
-        });
-    }
-
     public void onSuccess()
     {
         ActionBar toolbar = getSupportActionBar();
@@ -107,7 +69,7 @@ public class MangaActivity extends AppCompatActivity implements AsyncRunner.Runn
         setTextIn((TextView)findViewById(R.id.manga_authors), to_display.authors());
         setTextIn((TextView)findViewById(R.id.manga_summary), to_display.summary());
         setTextIn((TextView)findViewById(R.id.manga_rating), to_display.rating() * 5 + " / 5 stars");
-        setTextIn((TextView)findViewById(R.id.manga_genres), (to_display.genres() != null ? to_display.genres().toString() : null));
+        setTextIn((TextView)findViewById(R.id.manga_genres), (to_display.genres() != null ? to_display.genres() : null));
         setTextIn((TextView)findViewById(R.id.manga_status), to_display.status() );
 
         ((ImageView)findViewById(R.id.manga_cover)).setImageDrawable(to_display.cover());

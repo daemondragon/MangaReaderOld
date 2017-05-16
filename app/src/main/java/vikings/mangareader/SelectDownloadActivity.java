@@ -5,24 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import android.util.SparseBooleanArray;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 
-import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.text.ChoiceFormat;
 import java.util.ArrayList;
 
 import vikings.mangareader.Database.DatabaseMangaSaver;
@@ -86,8 +80,7 @@ public class SelectDownloadActivity extends AppCompatActivity {
     }
     public void start_download(View view){
         Toast.makeText(view.getContext(),"Download starting",Toast.LENGTH_SHORT).show();
-       ArrayList<Loader<Chapter>> temp = new ArrayList<>();
-
+        ArrayList<Loader<Chapter>> temp = new ArrayList<>();
 
         for (int i = 0; i < dl_list.getAdapter().getCount(); i++) {
                 if ( dl_list.isItemChecked(i) ) {
@@ -98,71 +91,68 @@ public class SelectDownloadActivity extends AppCompatActivity {
         saver.save(manga_to_dl, temp);
     }
 
+
+    private class DownloadAdaptor extends BaseAdapter{
+
+        private ArrayList<String> chapter_list;
+        private Context c;
+        private Manga to_dl;
+
+        DownloadAdaptor(Context c, ArrayList<String> list,Manga m)
+        {
+            this.c = c;
+            chapter_list = list;
+            to_dl = m;
+        }
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+        @Override
+        public int getCount() {
+            return chapter_list.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return to_dl.chapters.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        /**
+         * create the checkable view from the string
+         * @param position index of the item
+         * @param convertView checkable view should be null here
+         * @param parent the list view used to get context
+         * @return the checkable view
+         */
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            CheckBox convert = new CheckBox(c);
+            final ListView listView = (ListView)parent;
+            final int pos = position;
+            convert.setText(chapter_list.get(position));
+
+
+            convert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    listView.setItemChecked(pos, isChecked);
+                }
+            });
+
+
+            //LayoutInflater li = LayoutInflater.from(c);
+            //convert= (CheckBox)  (li.inflate(R.layout.support_simple_spinner_dropdown_item,parent));
+            //ArrayAdapter<String> a = new ArrayAdapter<String>(c,R.layout.support_simple_spinner_dropdown_item,chapter_list);
+
+            //return a.getView(position,convert,parent);
+            return convert;
+
+        }
+    }
 }
-
-
- class DownloadAdaptor extends BaseAdapter{
-
-     private ArrayList<String> chapter_list;
-     private Context c;
-     private Manga to_dl;
-
-     public DownloadAdaptor(Context c, ArrayList<String> list,Manga m)
-     {
-         this.c = c;
-         chapter_list = list;
-         to_dl = m;
-     }
-     @Override
-     public boolean hasStableIds() {
-         return true;
-     }
-     @Override
-     public int getCount() {
-         return chapter_list.size();
-     }
-
-     @Override
-     public Object getItem(int position) {
-         return to_dl.chapters.get(position);
-     }
-
-     @Override
-     public long getItemId(int position) {
-         return position;
-     }
-
-     /**
-      * create the checkable view from the string
-      * @param position index of the item
-      * @param convertView checkable view should be null here
-      * @param parent the list view used to get context
-      * @return the checkable view
-      */
-     @Override
-     public View getView(int position, View convertView, ViewGroup parent) {
-         CheckBox convert = new CheckBox(c);
-         final ListView listView = (ListView)parent;
-         final int pos = position;
-         convert.setText(chapter_list.get(position));
-
-
-         convert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-             @Override
-             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                 listView.setItemChecked(pos, isChecked);
-             }
-         });
-
-
-         //LayoutInflater li = LayoutInflater.from(c);
-         //convert= (CheckBox)  (li.inflate(R.layout.support_simple_spinner_dropdown_item,parent));
-         //ArrayAdapter<String> a = new ArrayAdapter<String>(c,R.layout.support_simple_spinner_dropdown_item,chapter_list);
-
-         //return a.getView(position,convert,parent);
-         return convert;
-
-     }
-
-
- }

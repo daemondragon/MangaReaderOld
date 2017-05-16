@@ -4,10 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,13 +26,12 @@ import vikings.mangareader.Manga.Manga;
 import vikings.mangareader.MangaFox.MangaFoxNewsLoader;
 import vikings.mangareader.MangaFox.MangaFoxSearchLoader;
 
-public class MangaProviderActivity extends AppCompatActivity implements AsyncRunner.Runnable
+public class MangaProviderActivity extends DrawerActivity implements AsyncRunner.Runnable
 {
-    static Stack<Loader<List<Loader<Manga>>>> mangas_providers = new Stack<>();
-
+    private String loader_name;
     private List<Loader<Manga>> mangas = null;
 
-    AsyncRunner loader = new AsyncRunner();
+    private AsyncRunner loader = new AsyncRunner();
 
     public void onCreate(Bundle savedInstanceBundle)
     {
@@ -44,10 +42,10 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
         main_toolbar.inflateMenu(R.menu.main_toolbar_menu);
         setSupportActionBar(main_toolbar);
 
-        init_drawer();
+        initDrawer();
 
-        if (mangas_providers.empty())
-            mangas_providers.add(new MangaFoxNewsLoader());
+        loader_name = getIntent().getStringExtra("LOADER");
+        loader_name = (loader_name == null ? "" : loader_name);
 
         init();
     }
@@ -74,41 +72,21 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
         }
     }
 
-    /**
-     * init the on click listener for the drawer list not the image button yet
-     *  !!!!!! to do link the image button !!!!!!!
-     */
-    public void init_drawer()
-    {
-        String[] nav_list = getResources().getStringArray(R.array.nav_drawer_list);
-        ListView drawer_list = (ListView) findViewById(R.id.drawer_view);
-        drawer_list.setAdapter(new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,nav_list));
-        drawer_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position){
-                    case 0 :
-                        (Toast.makeText(view.getContext(),"home",Toast.LENGTH_LONG)).show();
-                        break;
-                    case 1 :
-                        (Toast.makeText(view.getContext(),"bookmark",Toast.LENGTH_LONG)).show();
-                        break;
-                    case 2 :
-                        (Toast.makeText(view.getContext(),"downloads",Toast.LENGTH_LONG)).show();
-                        break;
-                    case 3 :
-                        (Toast.makeText(view.getContext(),"settings",Toast.LENGTH_LONG)).show();
-                        break;
-                    default: (Toast.makeText(view.getContext(),"dafuck",Toast.LENGTH_LONG)).show();
-                        break;
-                }
-            }
-        });
-    }
-
     public boolean run()
     {
-        mangas = mangas_providers.peek().load();
+        switch (loader_name)
+        {
+            case "DATABASE":
+                mangas = new DatabaseMangasListLoader(this).load();
+                break;
+            case "SEARCH":
+                mangas = new MangaFoxSearchLoader(getIntent().getStringExtra("SEARCH")).load();
+                break;
+            case "NEWS":
+            default:
+                mangas = new MangaFoxNewsLoader().load();
+                break;
+        }
         return (mangas != null);
     }
 
@@ -150,10 +128,6 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case R.id.action_advanced_search:
-                Toast debug = Toast.makeText(getApplicationContext(),"advanced search",Toast.LENGTH_LONG);
-                debug.show();
-                mangas_providers.add(new DatabaseMangasListLoader(context()));
-                startActivity(new Intent(MangaProviderActivity.this, MangaProviderActivity.class));
                 return true;
 
 
@@ -175,9 +149,12 @@ public class MangaProviderActivity extends AppCompatActivity implements AsyncRun
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                mangas_providers.add(new MangaFoxSearchLoader(query));
-                startActivity(new Intent(MangaProviderActivity.this, MangaProviderActivity.class));
+            public boolean onQueryTextSubmit(String query)
+            {
+                Intent intent = new Intent(MangaProviderActivity.this, MangaProviderActivity.class);
+                intent.putExtra("LOADER", "SEARCH");
+                intent.putExtra("SEARCH", query);
+                startActivity(intent);
                 return true;
             }
 
