@@ -23,7 +23,7 @@
         android:layout_height="match_parent"
         >
         <!-- The main content view -->
-        <RelativeLayout
+        <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/main_page"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -34,7 +34,7 @@
                 android:layout_height="match_parent"
                 android:choiceMode="singleChoice"/>
 
-        </RelativeLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     <include layout="@layout/drawer_layout"/>
 

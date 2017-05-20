@@ -35,7 +35,7 @@ public class DrawerActivity extends AppCompatActivity
                         intent = new Intent(DrawerActivity.this, MangaProviderActivity.class);
                         //Will clear all previous activity.
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra("LOADER", "NEWS");
+                        intent.putExtra(MangaProviderActivity.LOADER, MangaProviderActivity.FOX_LOADER);
                         startActivity(intent);
                         break;
                     case 1:
@@ -43,13 +43,13 @@ public class DrawerActivity extends AppCompatActivity
                         break;
                     case 2:
                         intent = new Intent(DrawerActivity.this, MangaProviderActivity.class);
-                        intent.putExtra("LOADER", "DATABASE");
+                        intent.putExtra(MangaProviderActivity.LOADER, MangaProviderActivity.DATABASE_LOADER);
                         startActivity(intent);
                         break;
                     case 3:
                         (Toast.makeText(view.getContext(),"settings",Toast.LENGTH_LONG)).show();
                         break;
-                    default: (Toast.makeText(view.getContext(),"dafuck",Toast.LENGTH_LONG)).show();
+                    default: (Toast.makeText(view.getContext(),"should never happen",Toast.LENGTH_LONG)).show();
                         break;
                 }
             }

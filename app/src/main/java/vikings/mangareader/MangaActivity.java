@@ -158,11 +158,10 @@ public class MangaActivity extends DrawerActivity implements AsyncRunner.Runnabl
         switch (item.getItemId()) {
             case R.id.select_download:
                 if (to_display != null) {
-                    /*
-                    DatabaseMangaSaver saver = new DatabaseMangaSaver(context());
-                    saver.save(to_display, to_display.chapters);
-                    */
-                    SelectDownloadActivity.start(this, to_display);
+                    DownloadOrRemoveActivity.manga = to_display;
+                    startActivity(new Intent(MangaActivity.this, DownloadOrRemoveActivity.class));
+                    //Je veux la liste avec la bonne hauteur pour les CheckedTextView.
+                    //SelectDownloadActivity.start(this, to_display);
                 }
                 return true;
 

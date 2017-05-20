@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,10 +29,19 @@ import vikings.mangareader.MangaFox.MangaFoxSearchLoader;
 
 public class MangaProviderActivity extends DrawerActivity implements AsyncRunner.Runnable
 {
+    static final String LOADER = "LOADER";
+    static final String FOX_LOADER = "FOX";
+    static final String DATABASE_LOADER = "DB";
+
+    static final String SEARCH_KEY = "SEARCH";
+    static final String SEARCH_QUERY = "SEARCH_QUERY";
+
     private String loader_name;
     private List<Loader<Manga>> mangas = null;
 
     private AsyncRunner loader = new AsyncRunner();
+
+    SwipeRefreshLayout refresh;
 
     public void onCreate(Bundle savedInstanceBundle)
     {
@@ -42,9 +52,17 @@ public class MangaProviderActivity extends DrawerActivity implements AsyncRunner
         main_toolbar.inflateMenu(R.menu.main_toolbar_menu);
         setSupportActionBar(main_toolbar);
 
+        refresh = (SwipeRefreshLayout) findViewById(R.id.main_page);
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loader.process(MangaProviderActivity.this);
+            }
+        });
+
         initDrawer();
 
-        loader_name = getIntent().getStringExtra("LOADER");
+        loader_name = getIntent().getStringExtra(LOADER);
         loader_name = (loader_name == null ? "" : loader_name);
 
         init();
@@ -76,15 +94,20 @@ public class MangaProviderActivity extends DrawerActivity implements AsyncRunner
     {
         switch (loader_name)
         {
-            case "DATABASE":
-                mangas = new DatabaseMangasListLoader(this).load();
+            case DATABASE_LOADER:
+                if (getIntent().getBooleanExtra(SEARCH_KEY, false))
+                    ;//Search in database.
+                else
+                    mangas = new DatabaseMangasListLoader(this).load();
+
                 break;
-            case "SEARCH":
-                mangas = new MangaFoxSearchLoader(getIntent().getStringExtra("SEARCH")).load();
-                break;
-            case "NEWS":
+            case FOX_LOADER:
             default:
-                mangas = new MangaFoxNewsLoader().load();
+                if (getIntent().getBooleanExtra(SEARCH_KEY, false))
+                    mangas = new MangaFoxSearchLoader(getIntent().getStringExtra(SEARCH_QUERY)).load();
+                else
+                    mangas = new MangaFoxNewsLoader().load();
+
                 break;
         }
         return (mangas != null);
@@ -92,6 +115,9 @@ public class MangaProviderActivity extends DrawerActivity implements AsyncRunner
 
     public void onSuccess()
     {
+        if (refresh != null)
+            refresh.setRefreshing(false);
+
         ListView manga_list_view = (ListView) findViewById(R.id.manga_list);
         ArrayList<String> mangas_name = new ArrayList<>();
         for (Loader<Manga> manga : mangas) {
@@ -152,8 +178,9 @@ public class MangaProviderActivity extends DrawerActivity implements AsyncRunner
             public boolean onQueryTextSubmit(String query)
             {
                 Intent intent = new Intent(MangaProviderActivity.this, MangaProviderActivity.class);
-                intent.putExtra("LOADER", "SEARCH");
-                intent.putExtra("SEARCH", query);
+                intent.putExtra(LOADER, loader_name);
+                intent.putExtra(SEARCH_KEY, true);
+                intent.putExtra(SEARCH_QUERY, query);
                 startActivity(intent);
                 return true;
             }
