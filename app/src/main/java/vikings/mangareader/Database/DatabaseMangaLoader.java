@@ -15,12 +15,12 @@ import java.util.List;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
 
-class DatabaseMangaLoader extends Loader<Manga>
+public class DatabaseMangaLoader extends Loader<Manga>
 {
     private Context context;
-    private String manga_path;
+    public String manga_path;
 
-    DatabaseMangaLoader(Context context, @NonNull String manga_path)
+    public DatabaseMangaLoader(Context context, @NonNull String manga_path)
     {
         super(manga_path.substring(manga_path.lastIndexOf("/") + 1));
         this.manga_path = manga_path;

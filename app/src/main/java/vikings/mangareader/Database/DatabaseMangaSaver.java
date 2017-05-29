@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,6 +51,8 @@ public class DatabaseMangaSaver
 
         public boolean run()
         {
+            (Toast.makeText(context(), "saving " + manga.name() + "..." ,Toast.LENGTH_SHORT)).show();
+
             manga_dir = new File(context.getFilesDir(), manga.name());
             if (!manga_dir.exists() && !manga_dir.mkdir())
                 return (false);
@@ -134,6 +137,7 @@ public class DatabaseMangaSaver
 
             public boolean run()
             {
+                (Toast.makeText(context(), "saving chapters " + chapters.get(chapter_index).name() + "..." ,Toast.LENGTH_SHORT)).show();
                 if (chapter_index < 0 || chapter_index >= chapters.size())
                     return (true);
 

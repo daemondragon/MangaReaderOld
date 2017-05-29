@@ -1,5 +1,6 @@
 package vikings.mangareader.MangaFox;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
@@ -11,11 +12,11 @@ import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
 import vikings.mangareader.Utils;
 
-class FoxMangaLoader extends Loader<Manga>
+public class FoxMangaLoader extends Loader<Manga>
 {
-    private String url;
+    public String url;
 
-    FoxMangaLoader(String name, String url)
+    public FoxMangaLoader(String name, String url)
     {
         super(name);
         this.url = url;

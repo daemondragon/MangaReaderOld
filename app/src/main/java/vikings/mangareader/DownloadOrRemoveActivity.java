@@ -22,6 +22,9 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import vikings.mangareader.Database.DatabaseMangaRemover;
+import vikings.mangareader.Database.DatabaseMangaSaver;
+import vikings.mangareader.Manga.AsyncRunner;
 import vikings.mangareader.Manga.Chapter;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
@@ -33,6 +36,8 @@ public class DownloadOrRemoveActivity extends AppCompatActivity
     static Manga manga;
 
     boolean[] checked;
+
+    DatabaseMangaSaver saver;
 
     public void onCreate(Bundle savedInstanceBundle)
     {
@@ -65,30 +70,51 @@ public class DownloadOrRemoveActivity extends AppCompatActivity
                 list_view.invalidateViews();//Used to refresh on-screen item
             }
         });
+
+        saver = new DatabaseMangaSaver(this);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu)
+    public boolean onPrepareOptionsMenu (Menu menu)
     {
-        super.onCreateOptionsMenu(menu);
         MenuItem item = menu.findItem(R.id.download_or_remove);
         if (item != null)
         {
             item.setTitle(getResources().getString(download ? R.string.download : R.string.remove));
             item.setIcon(getResources().getDrawable(download ? R.drawable.ic_download : R.drawable.ic_remove));
-            item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item)
-                {
-                    if (download)
-                        Log.d("Download", "test");
-                    else
-                        Log.d("Remove", "test");
-                    return true;
-                }
-            });
         }
+        else
+            Log.d("DownloadOrRemoveAct", "can't find menu item");
+        return (true);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.download_or_remove_menu, menu);
-        return true;
+        return (true);
+    }
+
+    public boolean onOptionsItemSelected (MenuItem item)
+    {
+        if (item.getItemId() == R.id.download_or_remove)
+        {
+            if (download)
+            {
+                List<Loader<Chapter>> list = new ArrayList<>();
+                for (int i = 0; i < manga.chapters.size(); ++i)
+                    if (checked[i])
+                        list.add(manga.chapters.get(i));
+
+                saver.save(manga, list);
+                Log.d("DownloadOrRemoveAct", "Download");
+            }
+            else {
+                Log.d("DownloadOrRemoveAct", "Remove");
+            }
+            return (true);
+        }
+        else
+            return (false);
     }
 
     private class CheckedTextAdapter extends BaseAdapter

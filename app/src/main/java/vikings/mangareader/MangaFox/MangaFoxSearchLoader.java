@@ -1,6 +1,7 @@
 package vikings.mangareader.MangaFox;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 
@@ -21,6 +22,11 @@ public class MangaFoxSearchLoader extends Loader<List<Loader<Manga>>>
                     "Smut", "Sports", "Supernatural", "Tragedy", "Webtoons", "Yaoi", "Yuri"));
 
     private String manga_to_search;
+
+    public MangaFoxSearchLoader()
+    {
+        manga_to_search = null;
+    }
 
     public MangaFoxSearchLoader(String manga_name_to_search)
     {
@@ -61,5 +67,4 @@ public class MangaFoxSearchLoader extends Loader<List<Loader<Manga>>>
 
         return (searched_mangas);
     }
-
 }

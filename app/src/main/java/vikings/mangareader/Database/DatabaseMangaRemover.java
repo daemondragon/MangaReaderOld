@@ -20,7 +20,7 @@ public class DatabaseMangaRemover implements AsyncRunner.Runnable
     private String manga_name;
     private List<String> chapters_name;
 
-    DatabaseMangaRemover(Context context, String manga_name, List<String> chapters_name)
+    public DatabaseMangaRemover(Context context, String manga_name, List<String> chapters_name)
     {
         this.context = context;
         this.manga_name = manga_name;

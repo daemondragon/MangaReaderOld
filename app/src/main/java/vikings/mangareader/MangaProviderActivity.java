@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import vikings.mangareader.Database.DatabaseMangaLoader;
 import vikings.mangareader.Database.DatabaseMangasListLoader;
 import vikings.mangareader.Manga.AsyncRunner;
 import vikings.mangareader.Manga.Loader;
 import vikings.mangareader.Manga.Manga;
+import vikings.mangareader.MangaFox.FoxMangaLoader;
 import vikings.mangareader.MangaFox.MangaFoxNewsLoader;
 import vikings.mangareader.MangaFox.MangaFoxSearchLoader;
 
@@ -37,6 +39,7 @@ public class MangaProviderActivity extends DrawerActivity implements AsyncRunner
     static final String SEARCH_QUERY = "SEARCH_QUERY";
 
     private String loader_name;
+
     private List<Loader<Manga>> mangas = null;
 
     private AsyncRunner loader = new AsyncRunner();
@@ -84,7 +87,14 @@ public class MangaProviderActivity extends DrawerActivity implements AsyncRunner
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    MangaActivity.start(MangaProviderActivity.this, mangas.get(position));
+                    Intent intent = new Intent(MangaProviderActivity.this, MangaActivity.class);
+                    intent.putExtra(MangaActivity.MANGA_NAME, mangas.get(position).name());
+                    if (DATABASE_LOADER.equals(loader_name))
+                        intent.putExtra(MangaActivity.MANGA_PATH, ((DatabaseMangaLoader)mangas.get(position)).manga_path);
+                    else
+                        intent.putExtra(MangaActivity.MANGA_URL, ((FoxMangaLoader)mangas.get(position)).url);
+
+                    startActivity(intent);
                 }
             });
         }

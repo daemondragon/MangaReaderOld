@@ -1,12 +1,14 @@
 package vikings.mangareader.Manga;
 
+import android.content.Intent;
+
 /**
  * All children class will load and unload Type.
  * @param <Type> which type have to be loaded.
  */
 public abstract class Loader<Type>
 {
-    private String name;
+    public String name;
 
     /**
      * Create a loader without name.

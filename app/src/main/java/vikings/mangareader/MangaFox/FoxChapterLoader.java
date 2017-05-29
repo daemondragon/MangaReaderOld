@@ -1,5 +1,7 @@
 package vikings.mangareader.MangaFox;
 
+import android.content.Intent;
+
 import vikings.mangareader.Manga.Chapter;
 import vikings.mangareader.Manga.Loader;
 

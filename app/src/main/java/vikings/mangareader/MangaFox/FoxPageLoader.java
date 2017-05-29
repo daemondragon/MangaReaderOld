@@ -1,5 +1,6 @@
 package vikings.mangareader.MangaFox;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 

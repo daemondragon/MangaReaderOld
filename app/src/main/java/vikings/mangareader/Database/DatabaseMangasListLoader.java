@@ -1,6 +1,7 @@
 package vikings.mangareader.Database;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import java.io.File;
@@ -14,7 +15,7 @@ import vikings.mangareader.Manga.Manga;
 
 public class DatabaseMangasListLoader extends Loader<List<Loader<Manga>>>
 {
-    private File manga_list_dir;
+    public File manga_list_dir;
     private Context context;
 
     public DatabaseMangasListLoader(Context context)
@@ -27,9 +28,9 @@ public class DatabaseMangasListLoader extends Loader<List<Loader<Manga>>>
     {
         List<Loader<Manga>> manga_list = new ArrayList<>();
 
-        for (File chapter : manga_list_dir.listFiles())
-            if (chapter.isDirectory())
-                manga_list.add(new DatabaseMangaLoader(context, chapter.getAbsolutePath()));
+        for (File manga : manga_list_dir.listFiles())
+            if (manga.isDirectory())
+                manga_list.add(new DatabaseMangaLoader(context, manga.getAbsolutePath()));
 
         Collections.sort(manga_list, new Comparator<Loader<Manga>>() {
             @Override
@@ -40,5 +41,10 @@ public class DatabaseMangasListLoader extends Loader<List<Loader<Manga>>>
 
 
         return (manga_list);
+    }
+
+    public boolean constructFrom(Intent intent)
+    {
+        return (true);
     }
 }
